@@ -164,3 +164,9 @@ See `docs/10_calibration_metrics_p15b.md`.
 See `docs/11_operating_point_p15c.md`.
 
 `OperatingPointSpec` + `operating-point-offline`：在 validation/calibration 上选阈值，在 test 上冻结评估；`optimize_on: test` → `TEST_LEAKAGE`。
+
+## 16. Selective prediction (P1.5-D)
+
+See `docs/12_selective_prediction_p15d.md`.
+
+`SelectiveSpec` + `selective-offline`：Risk-Coverage / AURC / Risk@Coverage / Coverage@Risk。

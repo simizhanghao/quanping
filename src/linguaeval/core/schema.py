@@ -346,6 +346,32 @@ class OperatingPointSpec:
 
 
 @dataclass
+class SelectiveSpec:
+    """Selective prediction / risk-coverage (P1.5-D).
+
+    Kernel: confidence ranking + correctness; no business field names.
+    """
+
+    target: str
+    evaluate_on: str = "test"  # test | validation | calibration | all
+    coverage_targets: List[float] = field(default_factory=lambda: [0.5, 0.8, 0.9, 1.0])
+    risk_targets: List[float] = field(default_factory=lambda: [0.05, 0.1, 0.2])
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "SelectiveSpec":
+        if not d or not d.get("target"):
+            raise ValueError("SelectiveSpec.target is required")
+        cov = d.get("coverage_targets")
+        risk = d.get("risk_targets")
+        return cls(
+            target=str(d["target"]),
+            evaluate_on=str(d.get("evaluate_on") or "test"),
+            coverage_targets=[float(x) for x in cov] if cov else [0.5, 0.8, 0.9, 1.0],
+            risk_targets=[float(x) for x in risk] if risk else [0.05, 0.1, 0.2],
+        )
+
+
+@dataclass
 class ConfidenceRecord:
     """Normalized per-sample confidence (decoupled from PredictionRecord)."""
 

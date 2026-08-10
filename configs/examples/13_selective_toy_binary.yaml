@@ -1,0 +1,18 @@
+run_id: selective_toy_binary
+packs: [selective]
+source:
+  adapter: jsonl
+  samples: ../../examples/toy_operating_point/samples.jsonl
+  predictions: ../../examples/toy_operating_point/predictions.jsonl
+task_spec: ../../examples/toy_operating_point/task.yaml
+output_spec: ../../examples/toy_operating_point/output.yaml
+confidence_spec: ../../examples/toy_operating_point/confidence.yaml
+parse:
+  mode: from_parsed
+selective:
+  target: label
+  evaluate_on: test
+  coverage_targets: [0.5, 0.8, 0.9, 1.0]
+  risk_targets: [0.05, 0.1, 0.2]
+  min_samples: 10
+output_dir: results/13_selective_toy_binary

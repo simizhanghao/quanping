@@ -9,6 +9,7 @@ from linguaeval.compare.protocol import ComparisonProtocolError
 from linguaeval.core.compare_runner import run_offline_compare
 from linguaeval.core.confidence_runner import run_offline_confidence
 from linguaeval.core.operating_point_runner import run_offline_operating_point
+from linguaeval.core.selective_runner import run_offline_selective
 from linguaeval.core.runner import run_offline_score
 from linguaeval.confidence.operating_point import OperatingPointError
 
@@ -37,6 +38,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Select threshold / operating point (P1.5-C; never optimize on test)",
     )
     p_op.add_argument("config", type=str, help="Path to operating-point YAML config")
+
+    p_sel = sub.add_parser(
+        "selective-offline",
+        help="Selective prediction Risk-Coverage / AURC (P1.5-D)",
+    )
+    p_sel.add_argument("config", type=str, help="Path to selective YAML config")
 
     args = parser.parse_args(argv)
     if args.command == "score-offline":
@@ -74,6 +81,14 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"[linguaeval] see: {out / 'operating_points.json'}, "
             f"{out / 'threshold_curve.json'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "selective-offline":
+        out = run_offline_selective(Path(args.config))
+        print(f"[linguaeval] offline selective written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'selective_metrics.json'}, "
+            f"{out / 'risk_coverage_curve.json'}, {out / 'report.md'}"
         )
         return 0
     return 2

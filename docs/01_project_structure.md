@@ -254,7 +254,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 09_confidence_contract_p15a.md
 │   ├── 10_calibration_metrics_p15b.md
 │   ├── 11_operating_point_p15c.md
-│   └── 12_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 12_selective_prediction_p15d.md
+│   └── 13_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -403,7 +404,7 @@ LlamaFactory/tests/yewupingce/n2s_test/
 | **A** | ConfidenceSpec / ConfidenceRecord / Extractor + availability（见 `docs/09_confidence_contract_p15a.md`） |
 | **B** | Discrimination + Calibration metrics（ECE/Brier/NLL/AUROC）on toy probs — `docs/10_calibration_metrics_p15b.md` |
 | **C** | Operating points / threshold curves — `docs/11_operating_point_p15c.md` |
-| **D** | Selective prediction + Risk-Coverage |
+| **D** | Selective prediction + Risk-Coverage — `docs/12_selective_prediction_p15d.md` |
 
 正式自由生成 N2S **无 prob**：Calibration = `NOT_AVAILABLE`（正确结果）。
 
@@ -493,8 +494,9 @@ README 必须分两表：
 | 9 | `docs/09_confidence_contract_p15a.md` | P1.5-A Confidence Contract |
 | 10 | `docs/10_calibration_metrics_p15b.md` | P1.5-B ECE/Brier/NLL/AUROC |
 | 11 | `docs/11_operating_point_p15c.md` | P1.5-C operating point / threshold |
-| 12 | P1.5-D Selective prediction | 下一步 |
-| 13 | `docs/12_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
+| 12 | `docs/12_selective_prediction_p15d.md` | P1.5-D selective / Risk-Coverage |
+| 13 | P2 Robustness | 下一步（P1.5 封板） |
+| 14 | `docs/13_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）
 
@@ -525,3 +527,4 @@ configs/examples/NN_verb_object.yaml
 11. P11：Kernel 新能力必须先过非 N2S 验收；P1.5-A Confidence 通用，N2S 无 score → NOT_AVAILABLE。  
 12. P1.5-B：在 ConfidenceRecord 上算 ECE/Brier/NLL/AUROC；toy 主验收；无 score → calibration NOT_AVAILABLE。  
 13. P1.5-C：通用 threshold / operating point；禁止 optimize_on=test；toy 已知最优阈值；N2S → NOT_AVAILABLE。  
+14. P1.5-D：Selective / Risk-Coverage / AURC；P1.5 封板；下一步 P2。  

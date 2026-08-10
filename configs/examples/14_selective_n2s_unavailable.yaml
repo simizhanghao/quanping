@@ -1,0 +1,21 @@
+# Free-gen N2S has no scores → selective NOT_AVAILABLE.
+run_id: selective_n2s_unavailable
+packs: [selective]
+source:
+  adapter: n2s_dialogue_prediction
+  model_id: qwen3_4b_sft
+  path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/qwen3_4b_test3.json
+task_spec: ../../examples/indonesian_n2s/task.yaml
+output_spec: ../../examples/indonesian_n2s/output.yaml
+parse:
+  mode: from_parsed
+confidence:
+  target: n2s
+  source:
+    type: probabilities
+    path: scores.n2s
+  predicted_path: $.n2s
+selective:
+  target: n2s
+  evaluate_on: all
+output_dir: results/14_selective_n2s_unavailable

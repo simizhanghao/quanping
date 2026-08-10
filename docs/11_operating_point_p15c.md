@@ -69,4 +69,4 @@ report.md
 
 ## Out of P1.5-C
 
-Temperature scaling / Risk-Coverage / selective prediction → **P1.5-D**。
+Selective prediction / Risk-Coverage → **P1.5-D**（见 `docs/12_selective_prediction_p15d.md`）。
