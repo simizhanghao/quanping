@@ -1,0 +1,11 @@
+run_id: perturb_toy_surface
+packs: [perturb]
+source:
+  samples: ../../examples/toy_metamorphic_intent/samples.jsonl
+seed: 42
+semantic_validity: AUTO_VALIDATED
+perturbations:
+  - id: case_lower
+  - id: strip_punctuation
+  - id: collapse_whitespace
+output_dir: results/16_perturb_toy_surface

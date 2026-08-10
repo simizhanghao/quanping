@@ -402,6 +402,128 @@ class ConfidenceRecord:
 
 
 @dataclass
+class PerturbationSpec:
+    """How to transform an input (generic; registered by id)."""
+
+    id: str
+    category: str = "surface"  # surface | lexical | context | ...
+    severity: int = 1
+    seed: Optional[int] = None
+    semantic_policy: str = "preserve"  # preserve | change | unknown
+    transform_version: str = "1"
+    params: Dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "PerturbationSpec":
+        if not d or not d.get("id"):
+            raise ValueError("PerturbationSpec.id is required")
+        return cls(
+            id=str(d["id"]),
+            category=str(d.get("category") or "surface"),
+            severity=int(d.get("severity") or 1),
+            seed=int(d["seed"]) if d.get("seed") is not None else None,
+            semantic_policy=str(d.get("semantic_policy") or "preserve"),
+            transform_version=str(d.get("transform_version") or "1"),
+            params=dict(d.get("params") or {}),
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class VariantRecord:
+    """Lineage-preserving perturbed sample."""
+
+    variant_id: str
+    parent_sample_id: str
+    perturbation_id: str
+    input: SampleInput
+    severity: int = 1
+    seed: Optional[int] = None
+    semantic_policy: str = "preserve"
+    semantic_validity: str = "UNVERIFIED"  # VERIFIED|AUTO_VALIDATED|UNVERIFIED|INVALID
+    transform_version: str = "1"
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "variant_id": self.variant_id,
+            "parent_sample_id": self.parent_sample_id,
+            "perturbation_id": self.perturbation_id,
+            "input": asdict(self.input),
+            "severity": self.severity,
+            "seed": self.seed,
+            "semantic_policy": self.semantic_policy,
+            "semantic_validity": self.semantic_validity,
+            "transform_version": self.transform_version,
+            "meta": self.meta,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "VariantRecord":
+        inp = d.get("input") or {}
+        return cls(
+            variant_id=str(d["variant_id"]),
+            parent_sample_id=str(d["parent_sample_id"]),
+            perturbation_id=str(d.get("perturbation_id") or d.get("perturbation") or ""),
+            input=SampleInput(text=inp.get("text"), messages=inp.get("messages")),
+            severity=int(d.get("severity") or 1),
+            seed=int(d["seed"]) if d.get("seed") is not None else None,
+            semantic_policy=str(d.get("semantic_policy") or "preserve"),
+            semantic_validity=str(d.get("semantic_validity") or "UNVERIFIED"),
+            transform_version=str(d.get("transform_version") or "1"),
+            meta=dict(d.get("meta") or {}),
+        )
+
+
+@dataclass
+class MetamorphicRelationSpec:
+    """What must hold after perturbation (CheckList-style)."""
+
+    type: str = "invariance"  # invariance | directional (reserved)
+    targets: List[str] = field(default_factory=list)
+    # directional reserved fields
+    expect: Optional[Dict[str, Any]] = None
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "MetamorphicRelationSpec":
+        d = d or {}
+        targets = d.get("targets") or []
+        if isinstance(targets, str):
+            targets = [targets]
+        return cls(
+            type=str(d.get("type") or "invariance").lower(),
+            targets=[str(t) for t in targets],
+            expect=dict(d["expect"]) if d.get("expect") else None,
+        )
+
+
+@dataclass
+class RobustnessRecord:
+    """One parent↔variant pair on one target."""
+
+    parent_sample_id: str
+    variant_id: str
+    target: str
+    perturbation_id: str
+    clean_pred: Any = None
+    variant_pred: Any = None
+    clean_correct: Optional[bool] = None
+    variant_correct: Optional[bool] = None
+    flipped: bool = False
+    relation_type: str = "invariance"
+    relation_satisfied: Optional[bool] = None
+    semantic_validity: str = "UNVERIFIED"
+    applicable: bool = True
+    exclusion: Optional[str] = None
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class ComparisonRecord:
     """Sample-level paired regression record (generic; no business field names)."""
 

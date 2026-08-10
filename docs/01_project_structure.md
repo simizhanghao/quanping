@@ -94,7 +94,7 @@
 | D2 | Schema / IF | `OutputValidator` | 格式与约束 | P1 **必做** |
 | D3 | Regression | `ModelComparator` | 任意 metric 的 Δ | P1 **必做** |
 | D4 | Language | `LanguagePack` | 目标语能力 | P3 planned |
-| D5 | Robustness | `PerturbationEngine` | clean vs perturbed | P2 planned |
+| D5 | Robustness | `robustness-offline` | Flip / Violation / Δ / robust_success | P2-A done |
 | D6 | Context | `ConversationRunner` | context strategy | P2 planned |
 | D7 | Calibration | `confidence-offline` | ECE/Brier/NLL/AUROC（P1.5-B）；曲线 → C/D | P1.5-B done |
 | D8 | Consistency | `Repeat/MetamorphicRunner` | agreement / flip | P2/P3 planned |
@@ -255,7 +255,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 10_calibration_metrics_p15b.md
 │   ├── 11_operating_point_p15c.md
 │   ├── 12_selective_prediction_p15d.md
-│   └── 13_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 13_metamorphic_reliability_p2.md
+│   └── 14_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -408,11 +409,17 @@ LlamaFactory/tests/yewupingce/n2s_test/
 
 正式自由生成 N2S **无 prob**：Calibration = `NOT_AVAILABLE`（正确结果）。
 
-### P2 — Reliability trio
+### P2 — Metamorphic Reliability Trio
 
-- D5 PerturbationSpec（首批 5 类印尼向扰动，接口通用）  
-- D6 Context strategy（optional conversation）  
-- D8 Consistency（共享 paired-eval 基建）
+见 `docs/13_metamorphic_reliability_p2.md`。
+
+| Slice | Goal |
+|-------|------|
+| **A** | Contract + Registry + invariance offline（`robustness-offline`） |
+| **B** | Deterministic surface: case / punctuation / whitespace（`perturb-offline`）+ Flip CI |
+| **C** | Realistic perturbations + semantic_validity + severity |
+| **D** | Robustness Regression（复用 P1 compare） |
+| **E** | D6 Context + D8 Consistency |
 
 ### P3 — Multilingual
 
@@ -495,8 +502,10 @@ README 必须分两表：
 | 10 | `docs/10_calibration_metrics_p15b.md` | P1.5-B ECE/Brier/NLL/AUROC |
 | 11 | `docs/11_operating_point_p15c.md` | P1.5-C operating point / threshold |
 | 12 | `docs/12_selective_prediction_p15d.md` | P1.5-D selective / Risk-Coverage |
-| 13 | P2 Robustness | 下一步（P1.5 封板） |
-| 14 | `docs/13_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
+| 13 | `docs/13_metamorphic_reliability_p2.md` | P2 metamorphic plan + P2-A |
+| 14 | P2-B surface transforms | done (`perturb-offline`) |
+| 15 | P2-C realistic perturbations | 下一步 |
+| 15 | `docs/14_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）
 
@@ -528,3 +537,4 @@ configs/examples/NN_verb_object.yaml
 12. P1.5-B：在 ConfidenceRecord 上算 ECE/Brier/NLL/AUROC；toy 主验收；无 score → calibration NOT_AVAILABLE。  
 13. P1.5-C：通用 threshold / operating point；禁止 optimize_on=test；toy 已知最优阈值；N2S → NOT_AVAILABLE。  
 14. P1.5-D：Selective / Risk-Coverage / AURC；P1.5 封板；下一步 P2。  
+15. P2-A：Metamorphic Contract + Registry + invariance offline；8 条硬坑写入 docs/13。  

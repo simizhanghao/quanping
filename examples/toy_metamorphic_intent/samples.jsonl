@@ -1,0 +1,8 @@
+{"sample_id": "s01", "input": {"text": "I want a Refund"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "s02", "input": {"text": "Where is my Package?"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "s03", "input": {"text": "Reset my Password"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "s04", "input": {"text": "Money back please"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "s05", "input": {"text": "Track this order"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "s06", "input": {"text": "Change email address"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "s07", "input": {"text": "Cancel and refund"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "s08", "input": {"text": "Delivery is late"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}

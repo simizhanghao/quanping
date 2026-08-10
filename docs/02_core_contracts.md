@@ -170,3 +170,9 @@ See `docs/11_operating_point_p15c.md`.
 See `docs/12_selective_prediction_p15d.md`.
 
 `SelectiveSpec` + `selective-offline`：Risk-Coverage / AURC / Risk@Coverage / Coverage@Risk。
+
+## 17. Metamorphic robustness (P2-A)
+
+See `docs/13_metamorphic_reliability_p2.md`.
+
+`PerturbationSpec` / `VariantRecord` / `MetamorphicRelationSpec` / `RobustnessRecord` + `robustness-offline`（invariance；surface apply → P2-B）。

@@ -42,14 +42,18 @@ PYTHONPATH=src python -m pytest -q
 | Calibration metrics ECE / Brier / NLL / AUROC | Supported (P1.5-B) |
 | Operating point / threshold (`operating-point-offline`) | Supported (P1.5-C) |
 | Selective prediction / Risk-Coverage (`selective-offline`) | Supported (P1.5-D) |
+| Metamorphic robustness contract (`robustness-offline`) | Supported (P2-A) |
+| Deterministic surface perturb (`perturb-offline`) | Supported (P2-B) |
 
-**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration` (probs), `toy_operating_point` (threshold/selective), `indonesian_n2s` (reference; confidence usually NOT_AVAILABLE).
+**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `indonesian_n2s` (reference).
 
 ## Planned (not supported yet)
 
 | Capability | Phase |
 |------------|-------|
-| Metamorphic robustness / consistency | P2 |
+| Realistic / multilingual perturbations | P2-C |
+| Robustness regression Base↔SFT | P2-D |
+| Context + Consistency (D6/D8) | P2-E |
 | Metamorphic robustness / consistency | P2 |
 | Multilingual language packs (IndoMMLU etc.) | P3 |
 | Production profiling + rich release cards | P4 |
@@ -73,6 +77,7 @@ PYTHONPATH=src python -m pytest -q
 | `docs/10_calibration_metrics_p15b.md` | P1.5-B calibration metrics |
 | `docs/11_operating_point_p15c.md` | P1.5-C operating point / threshold |
 | `docs/12_selective_prediction_p15d.md` | P1.5-D selective / Risk-Coverage |
+| `docs/13_metamorphic_reliability_p2.md` | P2 metamorphic plan + hard rules |
 
 ## Design hard rules
 
