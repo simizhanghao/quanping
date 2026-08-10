@@ -2,7 +2,7 @@
 
 **Status:** 立项口径冻结  
 **Date:** 2026-08-10  
-**配套结构文档:** `docs/00_project_structure.md`
+**配套结构文档:** `docs/01_project_structure.md`
 
 ---
 
@@ -200,5 +200,6 @@ linguaeval run config.yaml
 | 文档 | 用途 |
 |------|------|
 | 本文 `00_executive_brief.md` | 立项 / 向上汇报口径 |
-| `00_project_structure.md` | 工程结构、Contract、目录、验收 |
-| `01_core_contracts.md` | 字段级协议（随代码冻结） |
+| `01_project_structure.md` | 工程结构、Contract、目录、验收 |
+| `02_core_contracts.md` | 字段级协议（随代码冻结） |
+| `03_dimension_contracts.md` | D0–D10 一页纸（planned） |

@@ -97,7 +97,7 @@
 
 ## 3. Core Contracts（P0 必须冻结的 7 个）
 
-> 字段级 JSON Schema 另文冻结（建议下一文档 `01_core_contracts.md`）。  
+> 字段级 JSON Schema 另文冻结（见 `02_core_contracts.md`）。  
 > 本文只固定**职责边界与最小必填面**。
 
 ### 3.1 `SampleRecord` — 样本统一层
@@ -232,16 +232,16 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 ├── README.md                         # supported / planned 两表
 ├── pyproject.toml                    # 稍后
 ├── docs/
-│   ├── 00_project_structure.md       # 本文
-│   ├── 01_core_contracts.md          # 下一篇：字段级冻结
-│   ├── 02_dimension_contracts.md     # D0–D10 一页纸 Contract
-│   └── 03_roadmap_acceptance.md      # 可选：阶段验收细则
+│   ├── 00_executive_brief.md         # 立项 / 汇报口径
+│   ├── 01_project_structure.md       # 本文
+│   ├── 02_core_contracts.md          # 字段级冻结
+│   └── 03_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
-├── configs/                          # 用户/示例 YAML
+├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
-│       ├── indonesian_n2s.yaml
-│       ├── toy_multiclass.yaml
-│       └── toy_extraction.yaml
+│       ├── 01_score_toy_multiclass.yaml
+│       ├── 02_score_toy_metric_swap.yaml
+│       └── 03_score_n2s_offline_replay.yaml
 │
 ├── src/linguaeval/
 │   ├── __init__.py
@@ -437,10 +437,21 @@ README 必须分两表：
 | Order | Deliverable | Purpose |
 |------:|-------------|---------|
 | 0 | `docs/00_executive_brief.md` | 向上汇报口径（已入库） |
-| 1 | `docs/01_core_contracts.md` | 7 Contract 字段级冻结（已起步） |
-| 2 | Offline kernel + toy multiclass + N2S replay | P0 验收 A/B/C（代码已起步） |
-| 3 | `docs/02_dimension_contracts.md` | D0–D10 各一页 Contract |
-| 4 | Online ModelAdapter + P1 packs | 下一阶段 |
+| 1 | `docs/01_project_structure.md` | 结构安排（本文） |
+| 2 | `docs/02_core_contracts.md` | 7 Contract 字段级冻结（已起步） |
+| 3 | Offline kernel + numbered configs/results | P0 验收 A/B/C（已起步） |
+| 4 | `docs/03_dimension_contracts.md` | D0–D10 各一页 Contract |
+| 5 | Online ModelAdapter + Stage-1 packs | 下一阶段 |
+
+### Naming habit（硬性）
+
+```text
+results/NN_verb_object/
+docs/NN_descriptive_english.md
+configs/examples/NN_verb_object.yaml
+```
+
+禁止：`phase*` 目录名、双 `00_` 撞号、configs 无编号。
 
 **Note：** P0 离线内核与 Example adapters 已开始落地；空 Pack 实现目录仍禁止伪装为 supported。
 

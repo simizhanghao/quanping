@@ -18,7 +18,7 @@ N2S_METRICS = Path(
 
 @pytest.mark.skipif(not N2S_PRED.is_file(), reason="N2S prediction fixture missing")
 def test_n2s_offline_replay_matches_legacy_f1():
-    out = run_offline_score(ROOT / "configs/examples/n2s_offline_replay.yaml")
+    out = run_offline_score(ROOT / "configs/examples/03_score_n2s_offline_replay.yaml")
     business = json.loads((out / "business_metrics.json").read_text(encoding="utf-8"))
     legacy = json.loads(N2S_METRICS.read_text(encoding="utf-8"))
     primary = business["primary"]

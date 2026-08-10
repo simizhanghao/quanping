@@ -10,8 +10,8 @@ Business-aware evaluation harness for multilingual SFT models.
 | Doc | Purpose |
 |-----|---------|
 | [docs/00_executive_brief.md](docs/00_executive_brief.md) | Stakeholder / 立项口径 |
-| [docs/00_project_structure.md](docs/00_project_structure.md) | Engineering structure |
-| [docs/01_core_contracts.md](docs/01_core_contracts.md) | Field-level contracts |
+| [docs/01_project_structure.md](docs/01_project_structure.md) | Engineering structure |
+| [docs/02_core_contracts.md](docs/02_core_contracts.md) | Field-level contracts |
 
 ## Supported vs Planned
 
@@ -35,13 +35,13 @@ cd /data/hanchengcheng/hcc_1/eval_factory
 pip install -e ".[dev]"
 
 # Toy multiclass (P0 acceptance B)
-python -m linguaeval score-offline configs/examples/toy_multiclass_offline.yaml
+python -m linguaeval score-offline configs/examples/01_score_toy_multiclass.yaml
 
 # Metric swap without re-inference (P0 acceptance C)
-python -m linguaeval score-offline configs/examples/toy_multiclass_offline_f2.yaml
+python -m linguaeval score-offline configs/examples/02_score_toy_metric_swap.yaml
 
 # N2S offline replay (P0 acceptance A) — set path to existing prediction JSON
-python -m linguaeval score-offline configs/examples/n2s_offline_replay.yaml
+python -m linguaeval score-offline configs/examples/03_score_n2s_offline_replay.yaml
 ```
 
 ## Design one-liner

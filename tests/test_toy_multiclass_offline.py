@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_toy_multiclass_offline_accuracy():
-    out = run_offline_score(ROOT / "configs/examples/toy_multiclass_offline.yaml")
+    out = run_offline_score(ROOT / "configs/examples/01_score_toy_multiclass.yaml")
     import json
 
     business = json.loads((out / "business_metrics.json").read_text(encoding="utf-8"))

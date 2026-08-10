@@ -1,6 +1,7 @@
 # Core Contracts v0.1 (Field Freeze)
 
-对应代码：`src/linguaeval/core/schema.py`
+对应代码：`src/linguaeval/core/schema.py`  
+结构文档：`docs/01_project_structure.md`
 
 ## 1. SampleRecord
 
