@@ -1,0 +1,11 @@
+pack:
+  id: ind_v1
+  language: ind
+  version: "1"
+  capabilities:
+    reading_comprehension:
+      - toy_parallel_mc_ind
+    local_knowledge:
+      - toy_native_knowledge_ind
+    cultural_reasoning:
+      - toy_culture_stub_ind

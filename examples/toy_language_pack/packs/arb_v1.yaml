@@ -1,0 +1,7 @@
+pack:
+  id: arb_v1
+  language: arb
+  version: "1"
+  capabilities:
+    reading_comprehension:
+      - toy_parallel_mc_arb

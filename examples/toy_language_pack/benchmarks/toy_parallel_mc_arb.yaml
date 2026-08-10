@@ -1,0 +1,15 @@
+id: toy_parallel_mc_arb
+capability: reading_comprehension
+task_type: multiple_choice
+language: arb
+version: "0.1"
+revision: fixture
+provenance:
+  origin: parallel
+  translation: parallel
+  native_authored: false
+  source_language: eng
+  culture_sensitive: false
+metrics: [accuracy]
+scorer: deterministic
+status: AVAILABLE

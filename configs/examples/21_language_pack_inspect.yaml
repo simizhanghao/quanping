@@ -1,0 +1,13 @@
+run_id: language_pack_inspect_toy
+packs_meta: [language]
+languages:
+  - ../../examples/toy_language_pack/languages.yaml
+benchmarks:
+  - ../../examples/toy_language_pack/benchmarks
+packs:
+  - ../../examples/toy_language_pack/packs
+inspect_packs:
+  - ind_v1
+  - arb_v1
+probe_unknown_language: zzz
+output_dir: results/21_language_pack_inspect

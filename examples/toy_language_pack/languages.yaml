@@ -1,0 +1,10 @@
+- iso639_3: ind
+  name: Indonesian
+  script: Latn
+  locale: id-ID
+- iso639_3: arb
+  name: Standard Arabic
+  script: Arab
+  locale: ar
+  macrolanguage: ara
+  variant: msa

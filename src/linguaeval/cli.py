@@ -10,6 +10,7 @@ from linguaeval.core.compare_runner import run_offline_compare
 from linguaeval.core.confidence_runner import run_offline_confidence
 from linguaeval.core.consistency_runner import run_offline_consistency
 from linguaeval.core.context_runner import run_offline_context
+from linguaeval.core.language_runner import run_offline_language_inspect
 from linguaeval.core.operating_point_runner import run_offline_operating_point
 from linguaeval.core.perturb_runner import run_offline_perturb
 from linguaeval.core.robustness_compare_runner import run_offline_robustness_compare
@@ -17,6 +18,7 @@ from linguaeval.core.robustness_runner import run_offline_robustness
 from linguaeval.core.selective_runner import run_offline_selective
 from linguaeval.core.runner import run_offline_score
 from linguaeval.confidence.operating_point import OperatingPointError
+from linguaeval.language.registry import LanguageRegistryError
 from linguaeval.robustness.compare import VariantFingerprintError
 
 
@@ -80,6 +82,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Context ablation with_context vs without_context (D6 / P2-E)",
     )
     p_ctx.add_argument("config", type=str, help="Path to context YAML config")
+
+    p_lang = sub.add_parser(
+        "language-inspect-offline",
+        help="Inspect LanguagePack / Benchmark registry availability (D4 / P3-A)",
+    )
+    p_lang.add_argument("config", type=str, help="Path to language-pack YAML config")
 
     args = parser.parse_args(argv)
     if args.command == "score-offline":
@@ -166,6 +174,17 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"[linguaeval] see: {out / 'context_metrics.json'}, "
             f"{out / 'context_records.jsonl'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "language-inspect-offline":
+        try:
+            out = run_offline_language_inspect(Path(args.config))
+        except LanguageRegistryError as e:
+            print(f"[linguaeval] language-inspect FAILED ({e.reason}): {e}", file=sys.stderr)
+            return 2
+        print(f"[linguaeval] offline language-inspect written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'language_pack_audit.json'}, {out / 'report.md'}"
         )
         return 0
     return 2

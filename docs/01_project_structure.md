@@ -93,7 +93,7 @@
 | D1 | Business / Task | `TaskScorer` | 任务效果 | P1 **必做** |
 | D2 | Schema / IF | `OutputValidator` | 格式与约束 | P1 **必做** |
 | D3 | Regression | `ModelComparator` | 任意 metric 的 Δ | P1 **必做** |
-| D4 | Language | `LanguagePack` | 目标语能力 | P3 planned |
+| D4 | Language | `language-inspect-offline` | LanguagePack / Benchmark registry | P3-A done |
 | D5 | Robustness | `robustness-offline` | Flip / Violation / Δ / robust_success | P2-A done |
 | D6 | Context | `context-offline` | with/without ablation | P2-E done |
 | D7 | Calibration | `confidence-offline` | ECE/Brier/NLL/AUROC（P1.5-B）；曲线 → C/D | P1.5-B done |
@@ -424,9 +424,15 @@ LlamaFactory/tests/yewupingce/n2s_test/
 
 ### P3 — Multilingual
 
-- LanguagePack registry（接口通用；`ind` 先落地）  
-- Belebele + 1 knowledge/culture；lm-eval adapter 可选  
-- 第二语言（如 `ara`）证明非印尼硬编码  
+见 `docs/15_language_pack_p3a.md`。
+
+| Slice | Goal |
+|-------|------|
+| **A** | LanguagePack Contract + Registry + inspect（`ind`/`arb` fixtures） |
+| **B** | Belebele parallel reading adapter（换语言不换 Kernel） |
+| **C** | Native Indonesian（IndoMMLU → COPAL-ID） |
+| **D** | lm-eval adapter → PredictionRecord |
+| **E** | Cross-language × capability Base↔Candidate report + gates |
 
 ### P4 — Safety + Production
 
@@ -509,7 +515,8 @@ README 必须分两表：
 | 16 | P2-C realistic perturbations | done (typo/code_switch/distractor) |
 | 17 | P2-D Robustness Regression | done |
 | 18 | P2-E Context + Consistency | done |
-| 19 | P3 Multilingual / next track | 下一步 |
+| 19 | P3-A LanguagePack Contract | done (`docs/15_language_pack_p3a.md`) |
+| 20 | P3-B Belebele adapter | 下一步 |
 | 15 | `docs/14_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）

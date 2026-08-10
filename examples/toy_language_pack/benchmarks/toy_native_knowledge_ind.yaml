@@ -1,0 +1,14 @@
+id: toy_native_knowledge_ind
+capability: local_knowledge
+task_type: multiple_choice
+language: ind
+version: "0.1"
+revision: fixture
+provenance:
+  origin: native_authored
+  translation: native
+  native_authored: true
+  culture_sensitive: true
+metrics: [accuracy]
+scorer: deterministic
+status: AVAILABLE

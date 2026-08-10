@@ -26,7 +26,7 @@ PYTHONPATH=src python -m linguaeval compare-offline configs/examples/05_compare_
 PYTHONPATH=src python -m pytest -q
 ```
 
-## Supported (P0–P1)
+## Supported (P0–P2)
 
 | Capability | Status |
 |------------|--------|
@@ -42,22 +42,26 @@ PYTHONPATH=src python -m pytest -q
 | Calibration metrics ECE / Brier / NLL / AUROC | Supported (P1.5-B) |
 | Operating point / threshold (`operating-point-offline`) | Supported (P1.5-C) |
 | Selective prediction / Risk-Coverage (`selective-offline`) | Supported (P1.5-D) |
-| Metamorphic robustness contract (`robustness-offline`) | Supported (P2-A) |
-| Deterministic surface perturb (`perturb-offline`) | Supported (P2-B) |
-| Robustness semantics hardening (ScoreRecord/MetricSpec/NO-OP) | Supported (P2-C0) |
-| Realistic perturbations typo/code_switch/distractor | Supported (P2-C) |
-| Robustness compare Base↔SFT (`variant_fingerprint`) | Supported (P2-D) |
-| Context ablation / self-consistency | Supported (P2-E) |
+| P2-A Metamorphic contract (`robustness-offline`) | Supported |
+| P2-B Surface perturbation (`perturb-offline`) | Supported |
+| P2-C0 Robustness semantics hardening | Supported |
+| P2-C Realistic perturbations (typo/code_switch/distractor) | Supported |
+| P2-D Robustness compare (`variant_fingerprint`) | Supported |
+| P2-E Context ablation / self-consistency | Supported |
+| P3-A LanguagePack registry / inspect (`language-inspect-offline`) | Supported |
 
-**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `toy_consistency_intent`, `toy_context_intent`, `indonesian_n2s` (reference).
+**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `toy_consistency_intent`, `toy_context_intent`, `toy_language_pack`, `indonesian_n2s` (reference).
 
 ## Planned (not supported yet)
 
 | Capability | Phase |
 |------------|-------|
+| P3-B Belebele parallel reading adapter | P3-B |
+| P3-C Native Indonesian (IndoMMLU / COPAL-ID) | P3-C |
+| P3-D lm-eval adapter (`--log_samples` → PredictionRecord) | P3-D |
+| P3-E Cross-language × capability regression report | P3-E |
 | Colloquial / real ASR packs | later |
 | Online conversation prompt assembly | later |
-| Multilingual language packs (IndoMMLU etc.) | P3 |
 | Production profiling + rich release cards | P4 |
 | Online model inference in-core | later adapters |
 | HTML dashboard / auto slice discovery | non-goals for now |
@@ -81,6 +85,7 @@ PYTHONPATH=src python -m pytest -q
 | `docs/12_selective_prediction_p15d.md` | P1.5-D selective / Risk-Coverage |
 | `docs/13_metamorphic_reliability_p2.md` | P2 metamorphic plan + hard rules |
 | `docs/14_context_consistency_p2e.md` | P2-E D6 context + D8 consistency |
+| `docs/15_language_pack_p3a.md` | P3 LanguagePack plan + P3-A contract |
 
 ## Design hard rules
 

@@ -1,0 +1,15 @@
+id: toy_culture_stub_ind
+capability: cultural_reasoning
+task_type: multiple_choice
+language: ind
+version: "0.0"
+revision: stub
+provenance:
+  origin: native_authored
+  translation: native
+  native_authored: true
+  culture_sensitive: true
+metrics: [accuracy]
+scorer: deterministic
+status: NOT_AVAILABLE
+reason: fixture_not_wired
