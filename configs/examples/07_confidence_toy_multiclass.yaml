@@ -1,0 +1,12 @@
+run_id: confidence_toy_multiclass
+packs: [confidence]
+source:
+  adapter: jsonl
+  samples: ../../examples/toy_calibration/samples.jsonl
+  predictions: ../../examples/toy_calibration/predictions.jsonl
+task_spec: ../../examples/toy_calibration/task.yaml
+output_spec: ../../examples/toy_calibration/output.yaml
+confidence_spec: ../../examples/toy_calibration/confidence.yaml
+parse:
+  mode: from_parsed
+output_dir: results/07_confidence_toy_multiclass

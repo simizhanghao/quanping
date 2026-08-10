@@ -249,6 +249,76 @@ class SideScore:
 
 
 @dataclass
+class ConfidenceSourceSpec:
+    """Where confidence scores live on a PredictionRecord (generic)."""
+
+    type: str = "probabilities"  # probabilities | logits | logprob_margin | none
+    path: str = "scores"  # dotted path into prediction (usually scores.*)
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "ConfidenceSourceSpec":
+        d = d or {}
+        return cls(
+            type=str(d.get("type") or "probabilities"),
+            path=str(d.get("path") or "scores"),
+        )
+
+
+@dataclass
+class ConfidenceSpec:
+    """Contract: how to extract confidence for one TaskSpec target.
+
+    Kernel only knows target + source type/path — never business field names.
+    """
+
+    target: str
+    source: ConfidenceSourceSpec = field(default_factory=ConfidenceSourceSpec)
+    predicted_path: Optional[str] = None  # default: TaskSpec target.path on parsed
+    labels: Optional[List[str]] = None  # optional class order for vectors
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "ConfidenceSpec":
+        if not d or not d.get("target"):
+            raise ValueError("ConfidenceSpec.target is required")
+        return cls(
+            target=str(d["target"]),
+            source=ConfidenceSourceSpec.from_dict(d.get("source") or {}),
+            predicted_path=d.get("predicted_path"),
+            labels=list(d["labels"]) if d.get("labels") else None,
+        )
+
+
+@dataclass
+class ConfidenceRecord:
+    """Normalized per-sample confidence (decoupled from PredictionRecord)."""
+
+    sample_id: str
+    target: str
+    status: str  # AVAILABLE | NOT_AVAILABLE | NOT_APPLICABLE
+    reason: Optional[str] = None
+    gold: Any = None
+    prediction: Any = None
+    class_scores: Optional[Dict[str, float]] = None  # preferably probabilities
+    confidence: Optional[float] = None  # scalar used by later calibration packs
+    source_type: Optional[str] = None
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "sample_id": self.sample_id,
+            "target": self.target,
+            "status": self.status,
+            "reason": self.reason,
+            "gold": self.gold,
+            "prediction": self.prediction,
+            "class_scores": self.class_scores,
+            "confidence": self.confidence,
+            "source_type": self.source_type,
+            "meta": self.meta,
+        }
+
+
+@dataclass
 class ComparisonRecord:
     """Sample-level paired regression record (generic; no business field names)."""
 

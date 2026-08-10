@@ -1,0 +1,6 @@
+target: intent_class
+source:
+  type: probabilities
+  path: scores.intent_class
+predicted_path: $.intent_class
+labels: [refund, shipping, account]

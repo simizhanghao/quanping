@@ -39,6 +39,16 @@
 | P8 | N2S is Example-01 | Kernel 不得出现 `n2s`/`routing_skill` 硬编码字段名作为唯一路径 |
 | P9 | Markdown report first | HTML dashboard 延后；CI gate 可先 JSON |
 | P10 | Inspect/lm-eval optional | 不进 Core dependency |
+| P11 | Non-N2S acceptance first | **任何进入 Kernel 的新能力，必须至少通过一个非 N2S 任务验证；新增业务只能通过配置 / Adapter / Pack 接入，不得要求修改 Kernel** |
+
+### Kernel change gate (P11)
+
+```text
+换 target 名 / 换语言 / 换业务 / 换 adapter
+→ Kernel 代码不修改
+```
+
+做不到 = 抽象泄漏，禁止合并。
 
 ### No Empty Pack Rule（5 条件）
 
@@ -241,7 +251,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 06_slices_and_gates_p1c.md
 │   ├── 07_known_issues.md
 │   ├── 08_evaluation_semantics_p1d.md
-│   └── 09_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 09_confidence_contract_p15a.md
+│   └── 10_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -383,10 +394,16 @@ LlamaFactory/tests/yewupingce/n2s_test/
 - D2 schema/IF 细分指标  
 - D10 基础 timing/usage 写入 PredictionRecord  
 
-### P1.5 — Calibration
+### P1.5 — Calibration（通用 Confidence，不以 N2S 为样板）
 
-- scores API → threshold sweep / PR / ECE / Brier / Risk-Coverage  
-- `decision_curve.json`
+| Slice | Goal |
+|-------|------|
+| **A** | ConfidenceSpec / ConfidenceRecord / Extractor + availability（见 `docs/09_confidence_contract_p15a.md`） |
+| **B** | Discrimination + Calibration metrics（ECE/Brier/NLL/AUC）on toy probs |
+| **C** | Operating points / threshold curves |
+| **D** | Selective prediction + Risk-Coverage |
+
+正式自由生成 N2S **无 prob**：Calibration = `NOT_AVAILABLE`（正确结果）。
 
 ### P2 — Reliability trio
 
@@ -471,8 +488,9 @@ README 必须分两表：
 | 6 | `docs/06_slices_and_gates_p1c.md` | fixed slices + CI-aware gate（P1-C） |
 | 7 | `docs/07_known_issues.md` + README | P1-D 封板 |
 | 8 | `docs/08_evaluation_semantics_p1d.md` | P1-D 语义 |
-| 9 | P1.5 Calibration | 下一步主线 |
-| 10 | `docs/09_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
+| 9 | `docs/09_confidence_contract_p15a.md` | P1.5-A Confidence Contract |
+| 10 | P1.5-B/C/D Calibration metrics | 下一步 |
+| 11 | `docs/10_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）
 
@@ -500,3 +518,4 @@ configs/examples/NN_verb_object.yaml
 8. P1-A：Kernel 角色名 `baseline`/`candidate`；单 `compare.target`；semantic 默认；sample_id 严格对齐；applicable 排除四格；产物编号 `05_`/`06_`。  
 9. N2S P1-A reference：`content_Indonesian_multi_skill_qwen3_4b_base_en.json` vs `qwen3_4b_test3.json`（同评测集；不完整 base run 会被严格对齐拒绝）。  
 10. P1-D：golden `allowed_pairs`；`semantic_comparable`/`efficiency_comparable`；metric `NOT_APPLICABLE`；gate `INSUFFICIENT_SUPPORT`；README supported/planned。  
+11. P11：Kernel 新能力必须先过非 N2S 验收；P1.5-A Confidence 通用，N2S 无 score → NOT_AVAILABLE。  

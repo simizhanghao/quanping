@@ -1,0 +1,7 @@
+name: toy_calibration_intent
+task_type: classification
+targets:
+  - name: intent_class
+    type: multiclass
+    path: $.intent_class
+    labels: [refund, shipping, account]

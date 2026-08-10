@@ -140,3 +140,14 @@ Golden `comparison_protocol.allowed_pairs` rejects non-reference asset pairs (`N
 
 Metric blocks may be `{status: NOT_APPLICABLE, reason: ...}` instead of fake `0.0`.  
 Gates may return `INSUFFICIENT_SUPPORT` when `requirements.min_samples` / `min_clusters` unmet.
+
+## 13. ConfidenceSpec / ConfidenceRecord (P1.5-A)
+
+See `docs/09_confidence_contract_p15a.md`.
+
+| Object | Notes |
+|--------|------|
+| ConfidenceSpec | `target` + `source.type/path` (+ optional `predicted_path`, `labels`) |
+| ConfidenceRecord | `status` ∈ AVAILABLE \| NOT_AVAILABLE \| NOT_APPLICABLE；可选 `class_scores` + scalar `confidence` |
+
+Prediction protocol 与 Confidence protocol **解耦**：自由生成 JSON 可以没有 scores。

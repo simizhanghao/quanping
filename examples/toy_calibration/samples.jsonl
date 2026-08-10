@@ -1,0 +1,16 @@
+{"sample_id": "c01", "input": {"text": "refund please"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "c02", "input": {"text": "where is package"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "c03", "input": {"text": "reset password"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "c04", "input": {"text": "money back"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "c05", "input": {"text": "track order"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "c06", "input": {"text": "login issue"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "c07", "input": {"text": "cancel and refund"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "c08", "input": {"text": "delivery late"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "c09", "input": {"text": "change email"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "c10", "input": {"text": "refund status"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "c11", "input": {"text": "shipment delayed"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "c12", "input": {"text": "2fa help"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "c13", "input": {"text": "want refund"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "c14", "input": {"text": "courier update"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "c15", "input": {"text": "unlock account"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "c16", "input": {"text": "return item"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}

@@ -7,6 +7,7 @@ from pathlib import Path
 from linguaeval.compare.alignment import AlignmentError
 from linguaeval.compare.protocol import ComparisonProtocolError
 from linguaeval.core.compare_runner import run_offline_compare
+from linguaeval.core.confidence_runner import run_offline_confidence
 from linguaeval.core.runner import run_offline_score
 
 
@@ -22,6 +23,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Paired baseline vs candidate regression without model inference",
     )
     p_cmp.add_argument("config", type=str, help="Path to compare YAML config")
+
+    p_conf = sub.add_parser(
+        "confidence-offline",
+        help="Extract ConfidenceRecords from predictions (P1.5-A; no ECE yet)",
+    )
+    p_conf.add_argument("config", type=str, help="Path to confidence YAML config")
 
     args = parser.parse_args(argv)
     if args.command == "score-offline":
@@ -40,6 +47,11 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         print(f"[linguaeval] offline compare written to: {out}")
         print(f"[linguaeval] see: {out / 'comparison_metrics.json'} and {out / 'report.md'}")
+        return 0
+    if args.command == "confidence-offline":
+        out = run_offline_confidence(Path(args.config))
+        print(f"[linguaeval] offline confidence written to: {out}")
+        print(f"[linguaeval] see: {out / 'confidence_audit.json'} and {out / 'report.md'}")
         return 0
     return 2
 

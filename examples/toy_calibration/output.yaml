@@ -1,0 +1,4 @@
+format: text
+parser: identity
+schema:
+  required: [intent_class]

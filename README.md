@@ -38,14 +38,15 @@ PYTHONPATH=src python -m pytest -q
 | Bootstrap CI + cluster bootstrap | Supported |
 | Fixed slices + gates | Supported |
 | Golden protocol / comparability / metric applicability / gate min-support | Supported |
+| ConfidenceSpec extract (`confidence-offline`) | Supported (P1.5-A) |
 
-**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `indonesian_n2s` (reference).
+**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration` (probs), `indonesian_n2s` (reference; confidence usually NOT_AVAILABLE).
 
 ## Planned (not supported yet)
 
 | Capability | Phase |
 |------------|-------|
-| Calibration / selective prediction | P1.5 |
+| ECE / Brier / NLL / ROC / threshold / Risk-Coverage | P1.5-B/C/D |
 | Metamorphic robustness / consistency | P2 |
 | Multilingual language packs (IndoMMLU etc.) | P3 |
 | Production profiling + rich release cards | P4 |
@@ -65,9 +66,11 @@ PYTHONPATH=src python -m pytest -q
 | `docs/06_slices_and_gates_p1c.md` | Slices + gates |
 | `docs/07_known_issues.md` | Known issues |
 | `docs/08_evaluation_semantics_p1d.md` | P1-D semantics freeze |
+| `docs/09_confidence_contract_p15a.md` | P1.5-A confidence contract |
 
 ## Design hard rules
 
 - Kernel has **no** business field name branches (`n2s` / banking only in adapters & example YAML).
+- **P11:** every new Kernel capability must pass a **non-N2S** acceptance first.
 - Formal compare requires identical `sample_id` sets (default) and optional golden `allowed_pairs`.
-- Do not invent confidence scores for calibration (P1.5).
+- Do not invent confidence scores; missing source → `NOT_AVAILABLE`.

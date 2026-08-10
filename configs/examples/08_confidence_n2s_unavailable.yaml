@@ -1,0 +1,19 @@
+# Smoke only: free-generation N2S predictions have no probability scores.
+# Expected: all ConfidenceRecords status=NOT_AVAILABLE (not a failure).
+run_id: confidence_n2s_unavailable_smoke
+packs: [confidence]
+source:
+  adapter: n2s_dialogue_prediction
+  model_id: qwen3_4b_sft
+  path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/qwen3_4b_test3.json
+task_spec: ../../examples/indonesian_n2s/task.yaml
+output_spec: ../../examples/indonesian_n2s/output.yaml
+parse:
+  mode: from_parsed
+confidence:
+  target: n2s
+  source:
+    type: probabilities
+    path: scores.n2s
+  predicted_path: $.n2s
+output_dir: results/08_confidence_n2s_unavailable
