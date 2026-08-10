@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from linguaeval.compare.alignment import AlignmentError
+from linguaeval.compare.protocol import ComparisonProtocolError
 from linguaeval.core.compare_runner import run_offline_compare
 from linguaeval.core.runner import run_offline_score
 
@@ -32,8 +33,11 @@ def main(argv: list[str] | None = None) -> int:
         try:
             out = run_offline_compare(Path(args.config))
         except AlignmentError as e:
-            print(f"[linguaeval] compare FAILED: {e}", file=sys.stderr)
+            print(f"[linguaeval] compare FAILED (alignment): {e}", file=sys.stderr)
             return 1
+        except ComparisonProtocolError as e:
+            print(f"[linguaeval] compare FAILED (NOT_COMPARABLE): {e}", file=sys.stderr)
+            return 2
         print(f"[linguaeval] offline compare written to: {out}")
         print(f"[linguaeval] see: {out / 'comparison_metrics.json'} and {out / 'report.md'}")
         return 0

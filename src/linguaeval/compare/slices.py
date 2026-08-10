@@ -1,14 +1,14 @@
-"""Fixed-slice paired comparison (P1-C). Specs are config-driven; no business ifs."""
+"""Fixed-slice paired comparison (P1-C/D). Specs are config-driven; no business ifs."""
 
 from __future__ import annotations
 
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Sequence
 
-from linguaeval.compare.bootstrap import PairRow, _metric_on_indices
+from linguaeval.compare.applicability import metrics_with_applicability, pair_metric_delta
+from linguaeval.compare.bootstrap import PairRow
 from linguaeval.core.paths import get_by_path
 from linguaeval.core.schema import SampleRecord, ScoreRecord
-from linguaeval.metrics.classification import _round_maybe
 
 
 def _input_text_len(sample: SampleRecord) -> int:
@@ -19,7 +19,6 @@ def _input_text_len(sample: SampleRecord) -> int:
 
 
 def _bucket(value: float, edges: Sequence[float], labels: Optional[Sequence[str]]) -> str:
-    """edges are ascending upper bounds, length = n_buckets; labels optional length n."""
     for i, upper in enumerate(edges):
         if value <= float(upper):
             if labels and i < len(labels):
@@ -40,7 +39,6 @@ def resolve_slice_key(
     target: str,
     source: str,
 ) -> str:
-    """Resolve a slice key from a declarative source string."""
     src = (source or "").strip()
     if src in {"target.gold", "gold_of_target"}:
         ts = score_b.targets.get(target)
@@ -65,7 +63,6 @@ def resolve_slice_key(
     if src.startswith("gold."):
         v = get_by_path(sample.gold or {}, src[5:], default=None)
         return "unknown" if v is None else str(v)
-    # bare meta / conversation keys
     meta = sample.meta or {}
     conv = sample.conversation or {}
     if src in meta:
@@ -100,11 +97,18 @@ def build_slice_comparison(
     round_digits: Optional[int] = None,
     min_support: int = 1,
 ) -> Dict[str, Any]:
-    """Compute baseline/candidate/delta metrics per fixed slice."""
+    """Compute baseline/candidate/delta metrics per fixed slice with applicability."""
     sample_map = {s.sample_id: s for s in samples}
     b_map = {s.sample_id: s for s in scores_b}
     c_map = {s.sample_id: s for s in scores_c}
     row_index = {r.sample_id: i for i, r in enumerate(rows)}
+
+    # Ensure useful metrics for binary slices (without hardcoding business names)
+    names = list(metric_names)
+    if target_type == "binary":
+        for extra in ("accuracy", "specificity", "false_positive_rate", "f1", "recall"):
+            if extra not in names:
+                names.append(extra)
 
     out_slices: Dict[str, Any] = {}
     for spec in slice_specs:
@@ -131,26 +135,31 @@ def build_slice_comparison(
         for key, idxs in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0])):
             if len(idxs) < min_support:
                 continue
-            mb = _metric_on_indices(
-                rows, idxs, side="baseline", target_type=target_type, metric_names=metric_names, labels=labels
+            mb = metrics_with_applicability(
+                rows,
+                idxs,
+                side="baseline",
+                target_type=target_type,
+                metric_names=names,
+                labels=labels,
+                round_digits=round_digits,
             )
-            mc = _metric_on_indices(
-                rows, idxs, side="candidate", target_type=target_type, metric_names=metric_names, labels=labels
+            mc = metrics_with_applicability(
+                rows,
+                idxs,
+                side="candidate",
+                target_type=target_type,
+                metric_names=names,
+                labels=labels,
+                round_digits=round_digits,
             )
-            metrics: Dict[str, Any] = {}
-            for m in metric_names:
-                if m not in mb or m not in mc:
-                    continue
-                bv, cv = mb[m], mc[m]
-                metrics[m] = {
-                    "baseline": _round_maybe(bv, round_digits) if round_digits is not None else bv,
-                    "candidate": _round_maybe(cv, round_digits) if round_digits is not None else cv,
-                    "delta": _round_maybe(cv - bv, round_digits) if round_digits is not None else (cv - bv),
-                }
+            metrics = pair_metric_delta(mb, mc, names, round_digits=round_digits)
             gains = sum(1 for i in idxs if rows[i].transition == "gain")
             regs = sum(1 for i in idxs if rows[i].transition == "regression")
+            support_audit = (mc.get("_support") or mb.get("_support") or {}).get("value")
             block["values"][key] = {
                 "support": len(idxs),
+                "class_support": support_audit,
                 "metrics": metrics,
                 "transitions": {
                     "gain": gains,

@@ -4,7 +4,6 @@ baseline:
   source:
     adapter: n2s_dialogue_prediction
     model_id: qwen3_4b_base
-    # Must be the same eval set as SFT (3471). qwen3_4b_base_test3.json is a partial run — strict align rejects it.
     path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/content_Indonesian_multi_skill_qwen3_4b_base_en.json
 candidate:
   source:
@@ -22,6 +21,29 @@ compare:
   display:
     baseline: Base
     candidate: SFT
+comparison_protocol:
+  protocol_id: bca_n2s_v1
+  require_semantic_comparable: true
+  allowed_pairs:
+    - baseline_path_suffix: content_Indonesian_multi_skill_qwen3_4b_base_en.json
+      candidate_path_suffix: qwen3_4b_test3.json
+      note: Golden Base↔SFT reference (3471). Rejects partial qwen3_4b_base_test3.json.
+comparability:
+  semantic:
+    prompt_protocol: n2s_en_v1
+    context_protocol: context_turn_3
+    scoring_protocol: linguaeval_offline_v1
+    dataset_protocol: dialogue_20260615_BCA_clean_test3
+  baseline:
+    backend_family: vllm
+    decoding:
+      temperature: 0.0
+      top_p: 0.9
+  candidate:
+    backend_family: transformers
+    decoding:
+      temperature: 0.0
+      top_p: 0.9
 report:
   primary_target: n2s
   primary_metric: f1
@@ -30,12 +52,12 @@ statistics:
   n_bootstrap: 1000
   confidence_level: 0.95
   seed: 42
-  # N2S turns are nested under dialogue — cluster, do not treat turns as i.i.d.
   bootstrap_unit: dialogue_id
   metrics: [precision, recall, f1]
 slices:
   enabled: true
   min_support: 30
+  metrics: [f1, recall, accuracy, specificity, false_positive_rate]
   specs:
     - name: language
       source: meta.language
@@ -62,4 +84,7 @@ gates:
     path: statistics.metrics.f1.delta.ci_low
     op: ">="
     value: 0
+    requirements:
+      min_samples: 500
+      min_clusters: 50
 output_dir: results/06_compare_base_sft_n2s

@@ -18,10 +18,15 @@ from linguaeval.compare.aggregate import (
 from linguaeval.compare.alignment import AlignmentError, index_by_id, require_strict_alignment
 from linguaeval.compare.bootstrap import build_pair_rows, run_paired_bootstrap
 from linguaeval.compare.gates import evaluate_gates
+from linguaeval.compare.protocol import (
+    ComparisonProtocolError,
+    evaluate_comparability,
+    validate_comparison_protocol,
+)
 from linguaeval.compare.report import write_compare_report_md
 from linguaeval.compare.slices import build_slice_comparison
 from linguaeval.compare.transitions import build_comparison_records
-from linguaeval.core.fingerprint import build_provenance, fingerprint_records
+from linguaeval.core.fingerprint import build_provenance, fingerprint_records, sha256_file
 from linguaeval.core.manifest import write_json, write_manifest
 from linguaeval.core.schema import (
     MetricSpec,
@@ -266,6 +271,52 @@ def run_offline_compare(config_path: Path) -> Path:
         },
     }
 
+    baseline_pred_path = _resolve(
+        root,
+        (baseline_cfg.get("source") or baseline_cfg).get("path")
+        or (baseline_cfg.get("source") or baseline_cfg).get("predictions"),
+    )
+    candidate_pred_path = _resolve(
+        root,
+        (candidate_cfg.get("source") or candidate_cfg).get("path")
+        or (candidate_cfg.get("source") or candidate_cfg).get("predictions"),
+    )
+
+    comparability_cfg = dict(cfg.get("comparability") or {})
+    comparability = evaluate_comparability(
+        comparability_cfg,
+        baseline_side=dict(comparability_cfg.get("baseline") or {}),
+        candidate_side=dict(comparability_cfg.get("candidate") or {}),
+    )
+
+    dataset_fingerprint = fingerprint_records([s.to_dict() for s in samples_aligned])
+    protocol_audit = validate_comparison_protocol(
+        dict(cfg.get("comparison_protocol") or {}),
+        baseline_path=str(baseline_pred_path) if baseline_pred_path else None,
+        candidate_path=str(candidate_pred_path) if candidate_pred_path else None,
+        dataset_fingerprint=dataset_fingerprint,
+        task_spec_hash=sha256_file(task_path) if task_path else None,
+        output_spec_hash=sha256_file(output_path) if output_path else None,
+        metric_spec_hash=sha256_file(metric_path) if metric_path else None,
+        n_aligned=len(ordered_ids),
+        comparability=comparability,
+        require_semantic_comparable=bool(
+            (cfg.get("comparison_protocol") or {}).get("require_semantic_comparable", True)
+        )
+        if cfg.get("comparison_protocol")
+        else False,
+    )
+
+    comparison_metrics["comparability"] = comparability
+    comparison_metrics["comparison_protocol"] = protocol_audit
+    comparison_metrics["support"] = {
+        "n_samples": len(pair_rows),
+        "n_units": (statistics or {}).get("n_units") or len(pair_rows),
+        "n_aligned": len(ordered_ids),
+        "bootstrap_unit": bootstrap_unit,
+        "cluster_mode": bool((statistics or {}).get("cluster_mode")),
+    }
+
     gate_result: Optional[Dict[str, Any]] = None
     gate_specs = list(cfg.get("gates") or [])
     if gate_specs:
@@ -287,16 +338,13 @@ def run_offline_compare(config_path: Path) -> Path:
     provenance["candidate_prediction_fingerprint"] = fingerprint_records(
         [p.to_dict() for p in preds_c_ord]
     )
-    provenance["baseline_prediction_path"] = str(
-        _resolve(root, (baseline_cfg.get("source") or baseline_cfg).get("path")
-                 or (baseline_cfg.get("source") or baseline_cfg).get("predictions"))
-        or ""
-    )
-    provenance["candidate_prediction_path"] = str(
-        _resolve(root, (candidate_cfg.get("source") or candidate_cfg).get("path")
-                 or (candidate_cfg.get("source") or candidate_cfg).get("predictions"))
-        or ""
-    )
+    provenance["baseline_prediction_path"] = str(baseline_pred_path or "")
+    provenance["candidate_prediction_path"] = str(candidate_pred_path or "")
+    provenance["comparability"] = comparability
+    provenance["comparison_protocol"] = {
+        "protocol_id": protocol_audit.get("protocol_id"),
+        "allowed_pair_matched": protocol_audit.get("allowed_pair_matched"),
+    }
 
     run_id = cfg.get("run_id") or f"compare_{uuid4().hex[:8]}"
     manifest = RunManifest(
@@ -338,6 +386,8 @@ def run_offline_compare(config_path: Path) -> Path:
     gate_path = out_dir / "gate.json"
     if gate_result is not None:
         write_json(gate_path, gate_result)
+    protocol_path = out_dir / "comparison_protocol.json"
+    write_json(protocol_path, protocol_audit)
     write_compare_report_md(
         report_path, metrics=comparison_metrics, manifest=manifest.to_dict()
     )
@@ -347,6 +397,7 @@ def run_offline_compare(config_path: Path) -> Path:
         "comparison_records": str(records_path),
         "alignment_audit": str(audit_path),
         "report": str(report_path),
+        "comparison_protocol": str(protocol_path),
         **{f"{k}_cases": v for k, v in case_paths.items()},
     }
     if statistics is not None:

@@ -126,3 +126,17 @@ Paired offline regression over **baseline** vs **candidate** (display may say Ba
 | transition | `stable_correct` \| `gain` \| `regression` \| `both_wrong` (eligible only) |
 
 Alignment: default **strict** sample_id equality or run FAIL.
+
+## 12. Comparability + protocol (P1-D)
+
+See `docs/08_evaluation_semantics_p1d.md`.
+
+| Flag | Meaning |
+|------|---------|
+| semantic_comparable | prompt/context/scoring/dataset protocols match → business compare OK |
+| efficiency_comparable | backend/hardware/decoding match → latency compare OK |
+
+Golden `comparison_protocol.allowed_pairs` rejects non-reference asset pairs (`NOT_COMPARABLE`).
+
+Metric blocks may be `{status: NOT_APPLICABLE, reason: ...}` instead of fake `0.0`.  
+Gates may return `INSUFFICIENT_SUPPORT` when `requirements.min_samples` / `min_clusters` unmet.

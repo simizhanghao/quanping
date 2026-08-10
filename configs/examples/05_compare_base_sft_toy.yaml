@@ -22,6 +22,17 @@ compare:
   display:
     baseline: Base
     candidate: SFT
+comparability:
+  semantic:
+    prompt_protocol: toy_intent_v1
+    context_protocol: single_turn
+    scoring_protocol: linguaeval_offline_v1
+  baseline:
+    backend_family: offline_fixture
+    decoding: {temperature: 0.0}
+  candidate:
+    backend_family: offline_fixture
+    decoding: {temperature: 0.0}
 report:
   primary_target: intent_class
   primary_metric: accuracy
@@ -45,8 +56,6 @@ slices:
       buckets: [12, 20, 100000]
       labels: [short, medium, long]
 gates:
-  # Toy n=32: CI lower can cross 0 by noise — gate on point Δ here.
-  # CI-aware gate is demonstrated on the N2S example (06).
   - id: candidate_accuracy_min
     path: candidate_business.primary.value
     op: ">="
@@ -55,4 +64,11 @@ gates:
     path: metric_deltas.metrics.accuracy.delta
     op: ">="
     value: 0
+  # Demonstrates P1-D: tiny n must not FAIL a CI gate
+  - id: delta_accuracy_ci_lower
+    path: statistics.metrics.accuracy.delta.ci_low
+    op: ">="
+    value: 0
+    requirements:
+      min_samples: 500
 output_dir: results/05_compare_base_sft_toy

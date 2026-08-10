@@ -85,19 +85,43 @@ def write_compare_report_md(
         for sname, sblock in slices.items():
             lines.append(f"### `{sname}` (source={sblock.get('source')})")
             for key, vblock in (sblock.get("values") or {}).items():
-                # show primary-ish first metric
                 mets = vblock.get("metrics") or {}
-                m0 = next(iter(mets), None)
-                if m0:
-                    mb = mets[m0]
-                    lines.append(
-                        f"- `{key}` n={vblock.get('support')}: "
-                        f"{m0} {mb.get('baseline')} → {mb.get('candidate')} "
-                        f"(Δ={mb.get('delta')}; net_gain={((vblock.get('transitions') or {}).get('net_gain'))})"
-                    )
+                # prefer an applicable metric for the line summary
+                chosen = None
+                for pref in ("f1", "accuracy", "specificity", "macro_f1", "exact_match"):
+                    if pref in mets:
+                        chosen = pref
+                        break
+                if chosen is None and mets:
+                    chosen = next(iter(mets))
+                if chosen:
+                    mb = mets[chosen]
+                    if mb.get("status") == "NOT_APPLICABLE":
+                        lines.append(
+                            f"- `{key}` n={vblock.get('support')}: "
+                            f"{chosen}=NOT_APPLICABLE ({mb.get('reason')}); "
+                            f"net_gain={((vblock.get('transitions') or {}).get('net_gain'))}"
+                        )
+                    else:
+                        lines.append(
+                            f"- `{key}` n={vblock.get('support')}: "
+                            f"{chosen} {mb.get('baseline')} → {mb.get('candidate')} "
+                            f"(Δ={mb.get('delta')}; "
+                            f"net_gain={((vblock.get('transitions') or {}).get('net_gain'))})"
+                        )
                 else:
                     lines.append(f"- `{key}` n={vblock.get('support')}")
             lines.append("")
+
+    comp = metrics.get("comparability") or {}
+    if comp:
+        lines += [
+            "## Comparability",
+            "",
+            f"- semantic_comparable: `{comp.get('semantic_comparable')}`",
+            f"- efficiency_comparable: `{comp.get('efficiency_comparable')}`",
+            "",
+        ]
 
     gate = metrics.get("gate") or {}
     if gate:

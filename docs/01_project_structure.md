@@ -239,7 +239,9 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 04_paired_regression_p1a.md   # baseline/candidate compare (P1-A)
 │   ├── 05_bootstrap_statistics_p1b.md
 │   ├── 06_slices_and_gates_p1c.md
-│   └── 07_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 07_known_issues.md
+│   ├── 08_evaluation_semantics_p1d.md
+│   └── 09_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -370,6 +372,7 @@ LlamaFactory/tests/yewupingce/n2s_test/
 | **A** | `baseline`/`candidate` align + ComparisonRecord + 4-cell + mini metric Δ + cases（见 `docs/04_paired_regression_p1a.md`） |
 | **B** | paired / cluster bootstrap CI（见 `docs/05_bootstrap_statistics_p1b.md`） |
 | **C** | fixed slices + CI-aware gate（见 `docs/06_slices_and_gates_p1c.md`） |
+| **D** | evaluation semantics freeze：golden protocol / comparability / metric applicability / gate support（`docs/07_known_issues.md`, `docs/08_evaluation_semantics_p1d.md`） |
 
 **P1 不做：** IndoMMLU 接入、鲁棒扰动、自动 slice discovery。
 
@@ -466,9 +469,10 @@ README 必须分两表：
 | 4 | `docs/04_paired_regression_p1a.md` | baseline/candidate paired kernel（P1-A） |
 | 5 | `docs/05_bootstrap_statistics_p1b.md` | paired / cluster bootstrap CI（P1-B） |
 | 6 | `docs/06_slices_and_gates_p1c.md` | fixed slices + CI-aware gate（P1-C） |
-| 7 | Offline kernel + compare configs `05_`/`06_` | P0.5 + P1 验收 |
-| 8 | P1.5 Calibration | 下一步主线之一 |
-| 9 | `docs/07_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
+| 7 | `docs/07_known_issues.md` + README | P1-D 封板 |
+| 8 | `docs/08_evaluation_semantics_p1d.md` | P1-D 语义 |
+| 9 | P1.5 Calibration | 下一步主线 |
+| 10 | `docs/09_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）
 
@@ -495,3 +499,4 @@ configs/examples/NN_verb_object.yaml
 7. Report = Markdown first。  
 8. P1-A：Kernel 角色名 `baseline`/`candidate`；单 `compare.target`；semantic 默认；sample_id 严格对齐；applicable 排除四格；产物编号 `05_`/`06_`。  
 9. N2S P1-A reference：`content_Indonesian_multi_skill_qwen3_4b_base_en.json` vs `qwen3_4b_test3.json`（同评测集；不完整 base run 会被严格对齐拒绝）。  
+10. P1-D：golden `allowed_pairs`；`semantic_comparable`/`efficiency_comparable`；metric `NOT_APPLICABLE`；gate `INSUFFICIENT_SUPPORT`；README supported/planned。  

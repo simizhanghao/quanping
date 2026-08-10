@@ -75,8 +75,10 @@ def test_toy_compare_slices_and_gate():
     assert "gold_label" in slices["slices"]
     gold_vals = slices["slices"]["gold_label"]["values"]
     assert set(gold_vals) >= {"refund", "shipping", "account"}
-    assert gate["status"] == "PASS", gate
-    assert {g["id"] for g in gate["gates"]} >= {
-        "candidate_accuracy_min",
-        "delta_accuracy_min",
-    }
+    # P1-D: CI gate on n=32 → INSUFFICIENT_SUPPORT (must not look like FAIL)
+    assert gate["status"] == "INSUFFICIENT_SUPPORT", gate
+    assert gate["n_fail"] == 0
+    by_id = {g["id"]: g for g in gate["gates"]}
+    assert by_id["candidate_accuracy_min"]["status"] == "PASS"
+    assert by_id["delta_accuracy_min"]["status"] == "PASS"
+    assert by_id["delta_accuracy_ci_lower"]["status"] == "INSUFFICIENT_SUPPORT"
