@@ -66,4 +66,5 @@ confidence:
 
 ## Out of P1.5-A
 
-ECE, Brier, NLL, ROC/PR, threshold sweep, temperature scaling, Risk-Coverage → P1.5-B/C/D.
+ECE / Brier / NLL / AUROC → **P1.5-B**（见 `docs/10_calibration_metrics_p15b.md`）。  
+Threshold sweep / temperature scaling / Risk-Coverage → P1.5-C/D。

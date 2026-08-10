@@ -1,5 +1,6 @@
-"""Generic confidence extraction (P1.5-A). No business-specific logic."""
+"""Generic confidence extraction + calibration metrics (P1.5-A/B)."""
 
 from linguaeval.confidence.extract import extract_confidence_records
+from linguaeval.confidence.metrics import compute_calibration_metrics
 
-__all__ = ["extract_confidence_records"]
+__all__ = ["extract_confidence_records", "compute_calibration_metrics"]

@@ -26,7 +26,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p_conf = sub.add_parser(
         "confidence-offline",
-        help="Extract ConfidenceRecords from predictions (P1.5-A; no ECE yet)",
+        help="Extract confidence + calibration metrics (ECE/Brier/NLL/AUROC)",
     )
     p_conf.add_argument("config", type=str, help="Path to confidence YAML config")
 
@@ -51,7 +51,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "confidence-offline":
         out = run_offline_confidence(Path(args.config))
         print(f"[linguaeval] offline confidence written to: {out}")
-        print(f"[linguaeval] see: {out / 'confidence_audit.json'} and {out / 'report.md'}")
+        print(
+            f"[linguaeval] see: {out / 'calibration_metrics.json'}, "
+            f"{out / 'confidence_audit.json'}, {out / 'report.md'}"
+        )
         return 0
     return 2
 

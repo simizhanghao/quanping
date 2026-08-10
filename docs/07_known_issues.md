@@ -19,7 +19,7 @@
 | One compare.target per run | Multi-target orchestration loops later | post-P1.5 |
 | Joint success as first-class compare target | Derived target, not transition kernel change | later |
 | Online inference | Still offline PredictionRecord in | P2+ / adapters |
-| Calibration scores missing on free-gen N2S JSON | P1.5-A: `NOT_AVAILABLE` (expected; no prob-N2S) | P1.5-B+ metrics on toy probs |
+| Calibration scores missing on free-gen N2S JSON | P1.5-A/B: extract + metrics `NOT_AVAILABLE` (expected) | P1.5-C/D curves |
 | Public HTML dashboard | Explicit non-goal now | P4? |
 | IndoMMLU / multilingual packs | Planned | P3 |
 | Metamorphic robustness | Planned | P2 |

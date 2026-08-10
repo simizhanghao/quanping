@@ -1,4 +1,4 @@
-"""Offline confidence extraction runner (P1.5-A) — no calibration metrics yet."""
+"""Offline confidence extraction + calibration metrics (P1.5-A/B)."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ import yaml
 
 from linguaeval.adapters.dataset.registry import get_adapter
 from linguaeval.confidence.extract import extract_confidence_records, summarize_confidence
+from linguaeval.confidence.metrics import compute_calibration_metrics
 from linguaeval.core.fingerprint import build_provenance
 from linguaeval.core.manifest import write_json, write_manifest
-from linguaeval.core.schema import ConfidenceSpec, RunManifest, TaskSpec
+from linguaeval.core.schema import ConfidenceSpec, OutputSpec, RunManifest, TaskSpec
 from linguaeval.parse.pipeline import apply_output_spec
-from linguaeval.core.schema import OutputSpec
 
 
 def _load_yaml(path: Path) -> Dict[str, Any]:
@@ -37,6 +37,17 @@ def _resolve_out_dir(config_path: Path, out_dir_raw: str) -> Path:
         if (parent / "pyproject.toml").exists() or (parent / "src" / "linguaeval").exists():
             return parent / out_dir_raw
     return config_path.parent / out_dir_raw
+
+
+def _fmt_metric(block: Dict[str, Any]) -> str:
+    st = block.get("status")
+    if st != "AVAILABLE":
+        reason = block.get("reason")
+        return f"{st}" + (f" ({reason})" if reason else "")
+    val = block.get("value")
+    if isinstance(val, float):
+        return f"{val:.6f}"
+    return str(val)
 
 
 def run_offline_confidence(config_path: Path) -> Path:
@@ -74,6 +85,14 @@ def run_offline_confidence(config_path: Path) -> Path:
         **summarize_confidence(records),
     }
 
+    cal_cfg = dict(cfg.get("calibration") or {})
+    calibration = compute_calibration_metrics(
+        records,
+        n_bins=int(cal_cfg.get("n_bins") or 10),
+        min_samples=int(cal_cfg.get("min_samples") or 10),
+    )
+    calibration["target"] = spec.target
+
     out_dir = _resolve_out_dir(
         config_path, cfg.get("output_dir") or "results/07_confidence_offline"
     )
@@ -87,6 +106,10 @@ def run_offline_confidence(config_path: Path) -> Path:
     audit_path = out_dir / "confidence_audit.json"
     write_json(audit_path, audit)
 
+    cal_path = out_dir / "calibration_metrics.json"
+    write_json(cal_path, calibration)
+
+    m = calibration.get("metrics") or {}
     report_path = out_dir / "report.md"
     lines = [
         f"# LinguaEval Confidence — `{spec.target}`",
@@ -99,12 +122,20 @@ def run_offline_confidence(config_path: Path) -> Path:
         f"- NOT_APPLICABLE: {audit['counts'].get('NOT_APPLICABLE', 0)}",
         f"- availability_rate: {audit.get('availability_rate')}",
         "",
-        "P1.5-A extracts confidence only; ECE/Brier/thresholds are later slices.",
+        "## Calibration (P1.5-B)",
+        "",
+        f"- pack status: `{calibration.get('status')}`",
+        f"- n_usable: {calibration.get('n_usable')}",
+        f"- ECE: {_fmt_metric(m.get('ece') or {})}",
+        f"- Brier: {_fmt_metric(m.get('brier') or {})}",
+        f"- NLL: {_fmt_metric(m.get('nll') or {})}",
+        f"- AUROC (OVR macro): {_fmt_metric(m.get('auroc_ovr_macro') or {})}",
+        f"- accuracy: {_fmt_metric(m.get('accuracy') or {})}",
         "",
     ]
-    if audit["counts"].get("NOT_AVAILABLE", 0) == audit["n_records"] and audit["n_records"]:
+    if calibration.get("status") == "NOT_AVAILABLE":
         lines.append(
-            "**All records NOT_AVAILABLE** — confidence source missing "
+            "**Calibration NOT_AVAILABLE** — no usable confidence scores "
             "(expected for free-generation predictions without scores)."
         )
         lines.append("")
@@ -130,13 +161,14 @@ def run_offline_confidence(config_path: Path) -> Path:
             "target": spec.target,
             "source_type": spec.source.type,
             "availability_rate": audit.get("availability_rate"),
+            "calibration_status": calibration.get("status"),
         },
         artifact_index={
             "confidence_records": str(records_path),
             "confidence_audit": str(audit_path),
+            "calibration_metrics": str(cal_path),
             "report": str(report_path),
         },
     )
     write_manifest(out_dir / "manifest.json", manifest)
-    write_json(out_dir / "confidence_audit.json", audit)
     return out_dir

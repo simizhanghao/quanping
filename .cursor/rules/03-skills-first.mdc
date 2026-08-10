@@ -10,7 +10,9 @@ alwaysApply: true
 1. **Read** (via Read tool) at least:
    - `.cursor/skills/task-scoped-execution/SKILL.md`
    - `.cursor/skills/artifact-naming-and-cleanup/SKILL.md`
-2. **Load any other** project skill that matches the request (repo-orientation, experiment-smoke-test, rl-reward-grpo, etc.).
+2. **Load any other** project skill that matches the request
+   (command-presentation when giving shell commands; repo-orientation,
+   experiment-smoke-test, rl-reward-grpo, etc.).
 3. **Restate** the task-scoped 5-point contract when the turn involves work (not pure chitchat).
 4. Only then proceed with the answer or edits.
 

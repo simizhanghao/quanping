@@ -39,6 +39,7 @@ PYTHONPATH=src python -m pytest -q
 | Fixed slices + gates | Supported |
 | Golden protocol / comparability / metric applicability / gate min-support | Supported |
 | ConfidenceSpec extract (`confidence-offline`) | Supported (P1.5-A) |
+| Calibration metrics ECE / Brier / NLL / AUROC | Supported (P1.5-B) |
 
 **Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration` (probs), `indonesian_n2s` (reference; confidence usually NOT_AVAILABLE).
 
@@ -46,7 +47,7 @@ PYTHONPATH=src python -m pytest -q
 
 | Capability | Phase |
 |------------|-------|
-| ECE / Brier / NLL / ROC / threshold / Risk-Coverage | P1.5-B/C/D |
+| Threshold sweep / temperature scaling / Risk-Coverage | P1.5-C/D |
 | Metamorphic robustness / consistency | P2 |
 | Multilingual language packs (IndoMMLU etc.) | P3 |
 | Production profiling + rich release cards | P4 |
@@ -67,6 +68,7 @@ PYTHONPATH=src python -m pytest -q
 | `docs/07_known_issues.md` | Known issues |
 | `docs/08_evaluation_semantics_p1d.md` | P1-D semantics freeze |
 | `docs/09_confidence_contract_p15a.md` | P1.5-A confidence contract |
+| `docs/10_calibration_metrics_p15b.md` | P1.5-B calibration metrics |
 
 ## Design hard rules
 

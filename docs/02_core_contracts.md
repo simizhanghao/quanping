@@ -151,3 +151,10 @@ See `docs/09_confidence_contract_p15a.md`.
 | ConfidenceRecord | `status` ∈ AVAILABLE \| NOT_AVAILABLE \| NOT_APPLICABLE；可选 `class_scores` + scalar `confidence` |
 
 Prediction protocol 与 Confidence protocol **解耦**：自由生成 JSON 可以没有 scores。
+
+## 14. Calibration metrics (P1.5-B)
+
+See `docs/10_calibration_metrics_p15b.md`.
+
+`compute_calibration_metrics(ConfidenceRecord[])` → `calibration_metrics.json`  
+（ECE / Brier / NLL / AUROC OVR macro；无 score → pack `NOT_AVAILABLE`）。

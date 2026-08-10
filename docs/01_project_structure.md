@@ -96,7 +96,7 @@
 | D4 | Language | `LanguagePack` | 目标语能力 | P3 planned |
 | D5 | Robustness | `PerturbationEngine` | clean vs perturbed | P2 planned |
 | D6 | Context | `ConversationRunner` | context strategy | P2 planned |
-| D7 | Calibration | `ConfidenceEvaluator` | ECE/AURC/决策曲线 | P1.5 planned |
+| D7 | Calibration | `confidence-offline` | ECE/Brier/NLL/AUROC（P1.5-B）；曲线 → C/D | P1.5-B done |
 | D8 | Consistency | `Repeat/MetamorphicRunner` | agreement / flip | P2/P3 planned |
 | D9 | Safety | `SafetyPack` | unsafe / over-refusal | P4 planned |
 | D10 | Efficiency | `Profiler` | TTFT/p95/VRAM | P1 telemetry → P4 完整 |
@@ -252,7 +252,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 07_known_issues.md
 │   ├── 08_evaluation_semantics_p1d.md
 │   ├── 09_confidence_contract_p15a.md
-│   └── 10_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 10_calibration_metrics_p15b.md
+│   └── 11_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -399,7 +400,7 @@ LlamaFactory/tests/yewupingce/n2s_test/
 | Slice | Goal |
 |-------|------|
 | **A** | ConfidenceSpec / ConfidenceRecord / Extractor + availability（见 `docs/09_confidence_contract_p15a.md`） |
-| **B** | Discrimination + Calibration metrics（ECE/Brier/NLL/AUC）on toy probs |
+| **B** | Discrimination + Calibration metrics（ECE/Brier/NLL/AUROC）on toy probs — `docs/10_calibration_metrics_p15b.md` |
 | **C** | Operating points / threshold curves |
 | **D** | Selective prediction + Risk-Coverage |
 
@@ -489,8 +490,9 @@ README 必须分两表：
 | 7 | `docs/07_known_issues.md` + README | P1-D 封板 |
 | 8 | `docs/08_evaluation_semantics_p1d.md` | P1-D 语义 |
 | 9 | `docs/09_confidence_contract_p15a.md` | P1.5-A Confidence Contract |
-| 10 | P1.5-B/C/D Calibration metrics | 下一步 |
-| 11 | `docs/10_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
+| 10 | `docs/10_calibration_metrics_p15b.md` | P1.5-B ECE/Brier/NLL/AUROC |
+| 11 | P1.5-C/D threshold + Risk-Coverage | 下一步 |
+| 12 | `docs/11_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）
 
@@ -519,3 +521,4 @@ configs/examples/NN_verb_object.yaml
 9. N2S P1-A reference：`content_Indonesian_multi_skill_qwen3_4b_base_en.json` vs `qwen3_4b_test3.json`（同评测集；不完整 base run 会被严格对齐拒绝）。  
 10. P1-D：golden `allowed_pairs`；`semantic_comparable`/`efficiency_comparable`；metric `NOT_APPLICABLE`；gate `INSUFFICIENT_SUPPORT`；README supported/planned。  
 11. P11：Kernel 新能力必须先过非 N2S 验收；P1.5-A Confidence 通用，N2S 无 score → NOT_AVAILABLE。  
+12. P1.5-B：在 ConfidenceRecord 上算 ECE/Brier/NLL/AUROC；toy 主验收；无 score → calibration NOT_AVAILABLE。  

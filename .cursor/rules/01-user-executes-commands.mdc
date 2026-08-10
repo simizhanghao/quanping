@@ -15,14 +15,15 @@ NOT execute them.
    (git clone, pip/conda install, downloads, training, inference, long jobs,
    pdftoppm, etc.). Instead, output the exact copy-pasteable command(s).
 
-2. **Every command comes from the agent.** Provide:
-   - the exact command (copy-pasteable, correct paths, no placeholders unless flagged)
-   - a one-line purpose
-   - working directory if it matters
-   - what output/result to paste back
+2. **Every command comes from the agent** as a **standalone presentation block**
+   (see `.cursor/skills/command-presentation/SKILL.md`). Required shape:
 
-3. **One step at a time.** For multi-step operations, give commands in order and
-   wait for the user to run them and report results before the next step.
+   - Bold title: `**{动作}命令（请你执行）** — {目的}`
+   - One ` ```bash ` fence with `cd` + commands
+   - Closing: `执行后把终端输出贴回。`
+
+3. **One step at a time.** One primary command block per turn; wait for the
+   user to paste results before the next step.
 
 4. **After the user pastes output**, the agent interprets it and proposes the
    next command — never assumes success without seeing the result.
@@ -36,13 +37,3 @@ NOT execute them.
 
 - Anything using the shell: clone, install, mkdir, mv, rm, curl/wget, python,
   torchrun, git, docker, etc.
-
-## Format Template
-
-```
-用途: <一句话>
-目录: <cwd，如相关>
-命令:
-<command>
-执行后请把输出贴回。
-```
