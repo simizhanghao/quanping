@@ -4,7 +4,7 @@ Contract-only fixtures — **no real Belebele/IndoMMLU download**.
 
 | Pack | Language | Notes |
 |------|----------|-------|
-| `ind_v1` | `ind` | parallel reading + native knowledge + culture stub `NOT_AVAILABLE` |
+| `ind_v1` | `ind` | parallel reading + native knowledge (IndoMMLU-format) + culture (COPAL-format) |
 | `arb_v1` | `arb` (macrolanguage `ara`) | parallel reading only |
 
 ```bash

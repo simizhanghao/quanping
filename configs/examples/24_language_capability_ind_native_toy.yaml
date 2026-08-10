@@ -1,0 +1,42 @@
+run_id: language_capability_ind_native_toy
+packs: [language]
+task_spec: ../../examples/toy_indommlu/task.yaml
+output_spec: ../../examples/toy_indommlu/output.yaml
+metric_spec: ../../examples/toy_indommlu/metrics.yaml
+parse:
+  mode: from_parsed
+report:
+  primary_target: answer
+  primary_metric: accuracy
+capabilities:
+  reading_comprehension:
+    adapter: belebele_jsonl
+    languages:
+      ind:
+        samples: ../../examples/toy_belebele/ind_Latn.jsonl
+        benchmark_id: toy_belebele_ind
+        baseline:
+          predictions: ../../examples/toy_belebele/predictions_ind_base.jsonl
+        candidate:
+          predictions: ../../examples/toy_belebele/predictions_ind_sft.jsonl
+  local_knowledge:
+    adapter: indommlu_jsonl
+    languages:
+      ind:
+        samples: ../../examples/toy_indommlu/samples.jsonl
+        benchmark_id: toy_indommlu
+        baseline:
+          predictions: ../../examples/toy_indommlu/predictions_base.jsonl
+        candidate:
+          predictions: ../../examples/toy_indommlu/predictions_sft.jsonl
+  cultural_reasoning:
+    adapter: copal_jsonl
+    languages:
+      ind:
+        samples: ../../examples/toy_copal_id/samples.jsonl
+        benchmark_id: toy_copal_id
+        baseline:
+          predictions: ../../examples/toy_copal_id/predictions_base.jsonl
+        candidate:
+          predictions: ../../examples/toy_copal_id/predictions_sft.jsonl
+output_dir: results/24_language_capability_ind_native_toy

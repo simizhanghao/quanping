@@ -1,0 +1,38 @@
+run_id: language_capability_report_gates_toy
+packs: [language]
+adapter: belebele_jsonl
+capability: reading_comprehension
+task_spec: ../../examples/toy_belebele/task.yaml
+output_spec: ../../examples/toy_belebele/output.yaml
+metric_spec: ../../examples/toy_belebele/metrics.yaml
+parse:
+  mode: from_parsed
+report:
+  primary_target: answer
+  primary_metric: accuracy
+languages:
+  ind:
+    samples: ../../examples/toy_belebele/ind_Latn.jsonl
+    benchmark_id: toy_belebele_ind
+    baseline:
+      predictions: ../../examples/toy_belebele/predictions_ind_base.jsonl
+    candidate:
+      predictions: ../../examples/toy_belebele/predictions_ind_sft.jsonl
+  arb:
+    samples: ../../examples/toy_belebele/arb_Arab.jsonl
+    benchmark_id: toy_belebele_arb
+    baseline:
+      predictions: ../../examples/toy_belebele/predictions_arb_base.jsonl
+    candidate:
+      predictions: ../../examples/toy_belebele/predictions_arb_sft.jsonl
+# Target language (ind) must not regress; other language (arb) drop bounded.
+gates:
+  - id: target_ind_reading_min_gain
+    path: language_regression.by_capability.reading_comprehension.by_language.ind.delta_accuracy
+    op: ">="
+    value: 0.0
+  - id: other_arb_reading_max_drop
+    path: language_regression.by_capability.reading_comprehension.by_language.arb.delta_accuracy
+    op: ">="
+    value: -0.05
+output_dir: results/26_language_capability_report_gates_toy

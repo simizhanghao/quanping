@@ -1,0 +1,7 @@
+name: toy_belebele_mc
+task_type: classification
+targets:
+  - name: answer
+    type: multiclass
+    path: $.answer
+    labels: [A, B, C, D]

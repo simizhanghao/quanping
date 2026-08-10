@@ -1,0 +1,4 @@
+parse:
+  mode: from_parsed
+schema:
+  required: [answer]

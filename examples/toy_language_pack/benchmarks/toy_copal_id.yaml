@@ -1,5 +1,5 @@
-id: toy_native_knowledge_ind
-capability: local_knowledge
+id: toy_copal_id
+capability: cultural_reasoning
 task_type: multiple_choice
 language: ind
 version: "0.1"

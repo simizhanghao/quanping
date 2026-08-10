@@ -1,0 +1,5 @@
+metrics:
+  answer:
+    - accuracy
+round_digits: 4
+exclude_format_fail: true

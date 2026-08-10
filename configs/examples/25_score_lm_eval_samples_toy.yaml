@@ -1,0 +1,19 @@
+run_id: score_lm_eval_samples_toy
+packs: [business, language]
+source:
+  adapter: lm_eval_samples
+  task_name: toy_mc_ind
+  language: ind
+  benchmark_id: toy_lm_eval_mc
+  capability: local_knowledge
+  model_id: toy_lm_eval_model
+  samples: ../../examples/toy_lm_eval/samples_toy_mc_ind.json
+task_spec: ../../examples/toy_lm_eval/task.yaml
+output_spec: ../../examples/toy_lm_eval/output.yaml
+metric_spec: ../../examples/toy_lm_eval/metrics.yaml
+parse:
+  mode: from_parsed
+report:
+  primary_target: answer
+  primary_metric: accuracy
+output_dir: results/25_score_lm_eval_samples_toy

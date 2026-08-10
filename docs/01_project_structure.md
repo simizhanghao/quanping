@@ -93,7 +93,7 @@
 | D1 | Business / Task | `TaskScorer` | 任务效果 | P1 **必做** |
 | D2 | Schema / IF | `OutputValidator` | 格式与约束 | P1 **必做** |
 | D3 | Regression | `ModelComparator` | 任意 metric 的 Δ | P1 **必做** |
-| D4 | Language | `language-inspect-offline` | LanguagePack / Benchmark registry | P3-A done |
+| D4 | Language | `language-inspect-offline` / `language-matrix-offline` | LanguagePack + capability matrix + gates | P3-A–E done |
 | D5 | Robustness | `robustness-offline` | Flip / Violation / Δ / robust_success | P2-A done |
 | D6 | Context | `context-offline` | with/without ablation | P2-E done |
 | D7 | Calibration | `confidence-offline` | ECE/Brier/NLL/AUROC（P1.5-B）；曲线 → C/D | P1.5-B done |
@@ -428,11 +428,11 @@ LlamaFactory/tests/yewupingce/n2s_test/
 
 | Slice | Goal |
 |-------|------|
-| **A** | LanguagePack Contract + Registry + inspect（`ind`/`arb` fixtures） |
-| **B** | Belebele parallel reading adapter（换语言不换 Kernel） |
-| **C** | Native Indonesian（IndoMMLU → COPAL-ID） |
-| **D** | lm-eval adapter → PredictionRecord |
-| **E** | Cross-language × capability Base↔Candidate report + gates |
+| **A** | LanguagePack Contract + Registry + inspect（`ind`/`arb` fixtures） | done |
+| **B** | Belebele-format parallel reading matrix（换语言不换 Kernel） | done |
+| **C** | Native Indonesian（IndoMMLU → COPAL-ID format fixtures） | done |
+| **D** | lm-eval adapter → PredictionRecord（`--log_samples`，无 lm_eval 依赖） | done |
+| **E** | Cross-language × capability Base↔Candidate report + gates | done |
 
 ### P4 — Safety + Production
 
@@ -516,7 +516,11 @@ README 必须分两表：
 | 17 | P2-D Robustness Regression | done |
 | 18 | P2-E Context + Consistency | done |
 | 19 | P3-A LanguagePack Contract | done (`docs/15_language_pack_p3a.md`) |
-| 20 | P3-B Belebele adapter | 下一步 |
+| 20 | P3-B Belebele-format matrix | done |
+| 21 | P3-C Native Indonesian pack | done |
+| 22 | P3-D lm-eval adapter | done |
+| 23 | P3-E language capability regression report | done |
+| 24 | P4 Safety / Production (next track) | 下一步 |
 | 15 | `docs/14_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）

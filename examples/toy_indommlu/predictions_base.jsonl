@@ -1,0 +1,4 @@
+{"sample_id": "indommlu:ind:k01", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "indommlu:ind:k02", "model_id": "base", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "indommlu:ind:k03", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "indommlu:ind:k04", "model_id": "base", "parsed": {"answer": "C"}, "format": {"parse_ok": true, "schema_ok": true}}

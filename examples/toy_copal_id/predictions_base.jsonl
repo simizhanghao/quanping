@@ -1,0 +1,4 @@
+{"sample_id": "copal:ind:c01", "model_id": "base", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "copal:ind:c02", "model_id": "base", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "copal:ind:c03", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "copal:ind:c04", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}

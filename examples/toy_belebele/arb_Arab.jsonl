@@ -1,0 +1,8 @@
+{"link": "p01", "flores_passage": "المتجر مغلق يوم الاثنين.", "question": "متى يغلق المتجر؟", "mc_answer1": "الاثنين", "mc_answer2": "الثلاثاء", "mc_answer3": "الأربعاء", "mc_answer4": "الجمعة", "correct_answer_num": "1"}
+{"link": "p02", "flores_passage": "اشترى الطفل كتاباً.", "question": "ماذا اشترى؟", "mc_answer1": "قلماً", "mc_answer2": "كتاباً", "mc_answer3": "حقيبة", "mc_answer4": "حذاء", "correct_answer_num": "2"}
+{"link": "p03", "flores_passage": "يغادر القطار الساعة السابعة.", "question": "في أي ساعة يغادر القطار؟", "mc_answer1": "السادسة", "mc_answer2": "السابعة", "mc_answer3": "الثامنة", "mc_answer4": "التاسعة", "correct_answer_num": "2"}
+{"link": "p04", "flores_passage": "الأم تطبخ الأرز.", "question": "من يطبخ؟", "mc_answer1": "الأب", "mc_answer2": "الأخ", "mc_answer3": "الأم", "mc_answer4": "الأخت", "correct_answer_num": "3"}
+{"link": "p05", "flores_passage": "هطل المطر بغزارة في جاكرتا.", "question": "أين المطر الغزير؟", "mc_answer1": "باندونغ", "mc_answer2": "سورابايا", "mc_answer3": "ميدان", "mc_answer4": "جاكرتا", "correct_answer_num": "4"}
+{"link": "p06", "flores_passage": "يلعبون كرة القدم.", "question": "ما الرياضة؟", "mc_answer1": "كرة سلة", "mc_answer2": "كرة القدم", "mc_answer3": "سباحة", "mc_answer4": "تنس", "correct_answer_num": "2"}
+{"link": "p07", "flores_passage": "السوق يفتح كل صباح.", "question": "متى يفتح السوق؟", "mc_answer1": "صباحاً", "mc_answer2": "ظهراً", "mc_answer3": "عصراً", "mc_answer4": "ليلاً", "correct_answer_num": "1"}
+{"link": "p08", "flores_passage": "المعلم يشرح الدرس.", "question": "من يشرح؟", "mc_answer1": "الطالب", "mc_answer2": "المدير", "mc_answer3": "المعلم", "mc_answer4": "الحارس", "correct_answer_num": "3"}

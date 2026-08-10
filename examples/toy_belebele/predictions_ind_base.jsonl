@@ -1,0 +1,8 @@
+{"sample_id": "belebele:ind:p01", "model_id": "base", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p02", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p03", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p04", "model_id": "base", "parsed": {"answer": "C"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p05", "model_id": "base", "parsed": {"answer": "D"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p06", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p07", "model_id": "base", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:ind:p08", "model_id": "base", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}

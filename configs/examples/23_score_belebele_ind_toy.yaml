@@ -1,0 +1,17 @@
+run_id: score_belebele_ind_toy
+packs: [business]
+source:
+  adapter: belebele_jsonl
+  language: ind
+  benchmark_id: toy_belebele_ind
+  samples: ../../examples/toy_belebele/ind_Latn.jsonl
+  predictions: ../../examples/toy_belebele/predictions_ind_sft.jsonl
+task_spec: ../../examples/toy_belebele/task.yaml
+output_spec: ../../examples/toy_belebele/output.yaml
+metric_spec: ../../examples/toy_belebele/metrics.yaml
+parse:
+  mode: from_parsed
+report:
+  primary_target: answer
+  primary_metric: accuracy
+output_dir: results/23_score_belebele_ind_toy

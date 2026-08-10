@@ -49,17 +49,18 @@ PYTHONPATH=src python -m pytest -q
 | P2-D Robustness compare (`variant_fingerprint`) | Supported |
 | P2-E Context ablation / self-consistency | Supported |
 | P3-A LanguagePack registry / inspect (`language-inspect-offline`) | Supported |
+| P3-B Belebele-format matrix (`language-matrix-offline`) | Supported |
+| P3-C Native Indonesian capabilities (IndoMMLU/COPAL-format) | Supported |
+| P3-D lm-eval `--log_samples` adapter (`lm_eval_samples`) | Supported |
+| P3-E Language × capability regression report + gates | Supported |
 
-**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `toy_consistency_intent`, `toy_context_intent`, `toy_language_pack`, `indonesian_n2s` (reference).
+**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `toy_consistency_intent`, `toy_context_intent`, `toy_language_pack`, `toy_belebele`, `toy_indommlu`, `toy_copal_id`, `toy_lm_eval`, `indonesian_n2s` (reference).
 
 ## Planned (not supported yet)
 
 | Capability | Phase |
 |------------|-------|
-| P3-B Belebele parallel reading adapter | P3-B |
-| P3-C Native Indonesian (IndoMMLU / COPAL-ID) | P3-C |
-| P3-D lm-eval adapter (`--log_samples` → PredictionRecord) | P3-D |
-| P3-E Cross-language × capability regression report | P3-E |
+| Full Belebele / IndoMMLU / COPAL downloads | later data packs |
 | Colloquial / real ASR packs | later |
 | Online conversation prompt assembly | later |
 | Production profiling + rich release cards | P4 |

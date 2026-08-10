@@ -42,8 +42,18 @@ def ensure_builtin_adapters() -> None:
     global _BUILTINS_LOADED
     if _BUILTINS_LOADED:
         return
-    from linguaeval.adapters.dataset import jsonl_samples, n2s_dialogue
+    from linguaeval.adapters.dataset import (
+        belebele,
+        jsonl_samples,
+        lm_eval_samples,
+        n2s_dialogue,
+        native_mc,
+    )
 
     register_adapter("jsonl", jsonl_samples.load_from_config)
     register_adapter("n2s_dialogue_prediction", n2s_dialogue.load_from_config)
+    register_adapter("belebele_jsonl", belebele.load_from_config)
+    register_adapter("indommlu_jsonl", native_mc.load_indommlu_from_config)
+    register_adapter("copal_jsonl", native_mc.load_copal_from_config)
+    register_adapter("lm_eval_samples", lm_eval_samples.load_from_config)
     _BUILTINS_LOADED = True

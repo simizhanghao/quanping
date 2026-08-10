@@ -1,0 +1,8 @@
+{"sample_id": "belebele:arb:p01", "model_id": "sft", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p02", "model_id": "sft", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p03", "model_id": "sft", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p04", "model_id": "sft", "parsed": {"answer": "C"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p05", "model_id": "sft", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p06", "model_id": "sft", "parsed": {"answer": "A"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p07", "model_id": "sft", "parsed": {"answer": "C"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "belebele:arb:p08", "model_id": "sft", "parsed": {"answer": "B"}, "format": {"parse_ok": true, "schema_ok": true}}

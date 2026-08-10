@@ -6,6 +6,6 @@ pack:
     reading_comprehension:
       - toy_parallel_mc_ind
     local_knowledge:
-      - toy_native_knowledge_ind
+      - toy_indommlu
     cultural_reasoning:
-      - toy_culture_stub_ind
+      - toy_copal_id

@@ -10,6 +10,7 @@ from linguaeval.core.compare_runner import run_offline_compare
 from linguaeval.core.confidence_runner import run_offline_confidence
 from linguaeval.core.consistency_runner import run_offline_consistency
 from linguaeval.core.context_runner import run_offline_context
+from linguaeval.core.language_matrix_runner import run_offline_language_matrix
 from linguaeval.core.language_runner import run_offline_language_inspect
 from linguaeval.core.operating_point_runner import run_offline_operating_point
 from linguaeval.core.perturb_runner import run_offline_perturb
@@ -88,6 +89,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Inspect LanguagePack / Benchmark registry availability (D4 / P3-A)",
     )
     p_lang.add_argument("config", type=str, help="Path to language-pack YAML config")
+
+    p_lmat = sub.add_parser(
+        "language-matrix-offline",
+        help="Cross-language Belebele-style score + Base↔SFT deltas (D4 / P3-B)",
+    )
+    p_lmat.add_argument("config", type=str, help="Path to language-matrix YAML config")
 
     args = parser.parse_args(argv)
     if args.command == "score-offline":
@@ -185,6 +192,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[linguaeval] offline language-inspect written to: {out}")
         print(
             f"[linguaeval] see: {out / 'language_pack_audit.json'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "language-matrix-offline":
+        out = run_offline_language_matrix(Path(args.config))
+        print(f"[linguaeval] offline language-matrix written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'language_metrics.json'}, "
+            f"{out / 'language_regression.json'}, "
+            f"{out / 'language_capability_report.json'}, "
+            f"{out / 'gate.json'}, {out / 'report.md'}"
         )
         return 0
     return 2

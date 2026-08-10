@@ -1,0 +1,8 @@
+{"link": "p01", "flores_passage": "Toko tutup pada hari Senin.", "question": "Kapan toko tutup?", "mc_answer1": "Senin", "mc_answer2": "Selasa", "mc_answer3": "Rabu", "mc_answer4": "Jumat", "correct_answer_num": "1"}
+{"link": "p02", "flores_passage": "Anak itu membeli buku.", "question": "Apa yang dibeli?", "mc_answer1": "Pensil", "mc_answer2": "Buku", "mc_answer3": "Tas", "mc_answer4": "Sepatu", "correct_answer_num": "2"}
+{"link": "p03", "flores_passage": "Kereta berangkat pukul tujuh.", "question": "Jam berapa kereta berangkat?", "mc_answer1": "Enam", "mc_answer2": "Tujuh", "mc_answer3": "Delapan", "mc_answer4": "Sembilan", "correct_answer_num": "2"}
+{"link": "p04", "flores_passage": "Ibu memasak nasi.", "question": "Siapa yang memasak?", "mc_answer1": "Ayah", "mc_answer2": "Adik", "mc_answer3": "Ibu", "mc_answer4": "Kakak", "correct_answer_num": "3"}
+{"link": "p05", "flores_passage": "Hujan turun deras di Jakarta.", "question": "Di mana hujan deras?", "mc_answer1": "Bandung", "mc_answer2": "Surabaya", "mc_answer3": "Medan", "mc_answer4": "Jakarta", "correct_answer_num": "4"}
+{"link": "p06", "flores_passage": "Mereka bermain sepak bola.", "question": "Olahraga apa?", "mc_answer1": "Basket", "mc_answer2": "Sepak bola", "mc_answer3": "Renang", "mc_answer4": "Tenis", "correct_answer_num": "2"}
+{"link": "p07", "flores_passage": "Pasar buka setiap pagi.", "question": "Kapan pasar buka?", "mc_answer1": "Pagi", "mc_answer2": "Siang", "mc_answer3": "Sore", "mc_answer4": "Malam", "correct_answer_num": "1"}
+{"link": "p08", "flores_passage": "Guru menjelaskan pelajaran.", "question": "Siapa yang menjelaskan?", "mc_answer1": "Murid", "mc_answer2": "Kepala sekolah", "mc_answer3": "Guru", "mc_answer4": "Penjaga", "correct_answer_num": "3"}

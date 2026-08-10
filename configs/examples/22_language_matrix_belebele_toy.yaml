@@ -1,0 +1,28 @@
+run_id: language_matrix_belebele_toy
+packs: [language]
+adapter: belebele_jsonl
+capability: reading_comprehension
+task_spec: ../../examples/toy_belebele/task.yaml
+output_spec: ../../examples/toy_belebele/output.yaml
+metric_spec: ../../examples/toy_belebele/metrics.yaml
+parse:
+  mode: from_parsed
+report:
+  primary_target: answer
+  primary_metric: accuracy
+languages:
+  ind:
+    samples: ../../examples/toy_belebele/ind_Latn.jsonl
+    benchmark_id: toy_belebele_ind
+    baseline:
+      predictions: ../../examples/toy_belebele/predictions_ind_base.jsonl
+    candidate:
+      predictions: ../../examples/toy_belebele/predictions_ind_sft.jsonl
+  arb:
+    samples: ../../examples/toy_belebele/arb_Arab.jsonl
+    benchmark_id: toy_belebele_arb
+    baseline:
+      predictions: ../../examples/toy_belebele/predictions_arb_base.jsonl
+    candidate:
+      predictions: ../../examples/toy_belebele/predictions_arb_sft.jsonl
+output_dir: results/22_language_matrix_belebele_toy

@@ -1,0 +1,42 @@
+{
+  "samples": {
+    "toy_mc_ind": [
+      {
+        "doc_id": 0,
+        "doc": {"question": "Ibukota Indonesia?", "choices": ["Bandung", "Jakarta", "Medan", "Bali"]},
+        "target": "B",
+        "arguments": [["Question: Ibukota Indonesia?\nA. Bandung\nB. Jakarta\nC. Medan\nD. Bali\nAnswer:"]],
+        "resps": [[["B", -0.1]]],
+        "filtered_resps": "B",
+        "acc": 1.0
+      },
+      {
+        "doc_id": 1,
+        "doc": {"question": "Bahasa resmi?", "choices": ["Jawa", "Sunda", "Indonesia", "Bali"]},
+        "target": "C",
+        "arguments": [["Question: Bahasa resmi?\nA. Jawa\nB. Sunda\nC. Indonesia\nD. Bali\nAnswer:"]],
+        "resps": [[["A", -0.2]]],
+        "filtered_resps": "A",
+        "acc": 0.0
+      },
+      {
+        "doc_id": 2,
+        "doc": {"question": "Lambang negara?", "choices": ["Lagu", "Garuda", "Rupiah", "Batik"]},
+        "target": 1,
+        "arguments": [["Question: Lambang negara?\nA. Lagu\nB. Garuda\nC. Rupiah\nD. Batik\nAnswer:"]],
+        "resps": [[["B", -0.05]]],
+        "filtered_resps": ["B"],
+        "acc": 1.0
+      },
+      {
+        "doc_id": 3,
+        "doc": {"question": "Pulau barat terbesar?", "choices": ["Sumatera", "Bali", "Lombok", "Madura"]},
+        "target": "A",
+        "arguments": [["Question: Pulau barat terbesar?\nA. Sumatera\nB. Bali\nC. Lombok\nD. Madura\nAnswer:"]],
+        "resps": [[["A", -0.01]]],
+        "filtered_resps": "A",
+        "acc": 1.0
+      }
+    ]
+  }
+}

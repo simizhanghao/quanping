@@ -1,0 +1,4 @@
+{"id": "k01", "question": "Ibukota Indonesia adalah?", "choices": {"A": "Bandung", "B": "Jakarta", "C": "Surabaya", "D": "Medan"}, "answer": "B", "subject": "geography"}
+{"id": "k02", "question": "Bahasa resmi Indonesia adalah?", "choices": {"A": "Jawa", "B": "Sunda", "C": "Indonesia", "D": "Melayu Riau"}, "answer": "C", "subject": "language"}
+{"id": "k03", "question": "Garuda Pancasila adalah?", "choices": {"A": "Lagu", "B": "Lambang negara", "C": "Mata uang", "D": "Provinsi"}, "answer": "B", "subject": "civics"}
+{"id": "k04", "question": "Pulau terbesar di Indonesia bagian barat adalah?", "choices": {"A": "Sumatera", "B": "Bali", "C": "Lombok", "D": "Madura"}, "answer": "A", "subject": "geography"}

@@ -66,7 +66,7 @@ def test_pack_requires_registered_language():
     assert ei.value.reason == "language_not_registered"
 
 
-def test_ind_arb_fixtures_and_unavailable_stub():
+def test_ind_arb_fixtures_native_vs_parallel():
     load_language_ecosystem(CFG, reset=True)
     assert get_language("ind").iso639_3 == "ind"
     assert get_language("arb").macrolanguage == "ara"
@@ -75,8 +75,8 @@ def test_ind_arb_fixtures_and_unavailable_stub():
 
     ind = resolve_pack_availability("ind_v1")
     culture = ind["capabilities"]["cultural_reasoning"][0]
-    assert culture["status"] == "NOT_AVAILABLE"
-    assert culture["reason"] == "fixture_not_wired"
+    assert culture["status"] == "AVAILABLE"
+    assert culture["native_authored"] is True
 
     reading = ind["capabilities"]["reading_comprehension"][0]
     assert reading["status"] == "AVAILABLE"
@@ -90,6 +90,37 @@ def test_ind_arb_fixtures_and_unavailable_stub():
     assert arb["capabilities"]["reading_comprehension"][0]["status"] == "AVAILABLE"
 
 
+def test_unavailable_benchmark_never_fills_zero():
+    from linguaeval.language.registry import register_benchmark, register_language, register_pack
+
+    register_language(LanguageSpec(iso639_3="ind", name="Indonesian"))
+    register_benchmark(
+        BenchmarkSpec.from_dict(
+            {
+                "id": "stub_x",
+                "capability": "cultural_reasoning",
+                "task_type": "multiple_choice",
+                "language": "ind",
+                "provenance": {"origin": "native_authored", "translation": "native"},
+                "status": "NOT_AVAILABLE",
+                "reason": "fixture_not_wired",
+            }
+        )
+    )
+    register_pack(
+        LanguagePackSpec(
+            id="stub_pack",
+            language="ind",
+            capabilities={"cultural_reasoning": ["stub_x"]},
+        )
+    )
+    row = resolve_pack_availability("stub_pack")["capabilities"]["cultural_reasoning"][0]
+    assert row["status"] == "NOT_AVAILABLE"
+    assert row["reason"] == "fixture_not_wired"
+    assert "score" not in row
+    assert row.get("accuracy") is None
+
+
 def test_language_inspect_offline():
     out = run_offline_language_inspect(CFG)
     audit = json.loads((out / "language_pack_audit.json").read_text(encoding="utf-8"))
@@ -100,8 +131,8 @@ def test_language_inspect_offline():
     probe = audit["unknown_language_probe"]
     assert probe["status"] == "NOT_AVAILABLE"
     assert probe["reason"] == "unknown_language"
-    # culture stub present as NOT_AVAILABLE, not coerced to 0
     ind_block = next(p for p in audit["resolved_packs"] if p["pack_id"] == "ind_v1")
-    stub = ind_block["capabilities"]["cultural_reasoning"][0]
-    assert stub["status"] == "NOT_AVAILABLE"
-    assert "score" not in stub
+    culture = ind_block["capabilities"]["cultural_reasoning"][0]
+    assert culture["status"] == "AVAILABLE"
+    assert culture["native_authored"] is True
+    assert "score" not in culture

@@ -1,0 +1,4 @@
+{"id": "c01", "premise": "Di warung, pembeli bilang 'berapa harganya?'", "choice1": "Menanyakan harga", "choice2": "Memesan tiket", "label": 0, "variant": "standard"}
+{"id": "c02", "premise": "Teman bilang 'lagi di Jaksel nih'.", "choice1": "Sedang di Jakarta Selatan", "choice2": "Sedang di Jepang", "label": 0, "variant": "jakarta"}
+{"id": "c03", "premise": "Orang bilang 'sudah maghrib'.", "choice1": "Waktu sholat sore", "choice2": "Waktu makan siang", "label": 0, "variant": "standard"}
+{"id": "c04", "premise": "Katanya 'gue udah makan'.", "choice1": "Dia belum makan", "choice2": "Dia sudah makan", "label": 1, "variant": "jakarta"}
