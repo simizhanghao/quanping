@@ -1,0 +1,9 @@
+metrics:
+  amount:
+    - exact_match
+  time:
+    - exact_match
+  joint:
+    - exact_joint_success
+round_digits: 4
+exclude_format_fail: true

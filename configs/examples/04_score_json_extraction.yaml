@@ -1,0 +1,15 @@
+run_id: toy_json_extraction_from_raw
+packs: [business, schema]
+source:
+  adapter: jsonl
+  samples: ../../examples/toy_extraction/samples.jsonl
+  predictions: ../../examples/toy_extraction/predictions.jsonl
+task_spec: ../../examples/toy_extraction/task.yaml
+output_spec: ../../examples/toy_extraction/output.yaml
+metric_spec: ../../examples/toy_extraction/metrics.yaml
+parse:
+  mode: from_raw
+report:
+  primary_target: amount
+  primary_metric: exact_match
+output_dir: results/04_eval_json_extraction

@@ -1,0 +1,10 @@
+format: json
+parser: json
+schema:
+  required: [amount, time]
+  types:
+    amount: number
+    time: string
+constraints:
+  no_markdown: true
+  forbidden_keys: [explanation]

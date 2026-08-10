@@ -2,5 +2,7 @@ format: json
 parser: json
 schema:
   required: [n2s, routing_skill, primary_intent]
+  types:
+    n2s: boolean
 constraints:
   no_markdown: true

@@ -1,0 +1,32 @@
+{"sample_id": "e01", "input": {"text": "Saya transfer Rp500.000 kemarin."}, "gold": {"amount": 500000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e02", "input": {"text": "Transfer 250000 tadi pagi"}, "gold": {"amount": 250000, "time": "tadi pagi"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e03", "input": {"text": "Kirim Rp1.000.000 minggu lalu"}, "gold": {"amount": 1000000, "time": "minggu lalu"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e04", "input": {"text": "Bayar 75000 hari ini"}, "gold": {"amount": 75000, "time": "hari ini"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e05", "input": {"text": "Transfer Rp90.000 semalam"}, "gold": {"amount": 90000, "time": "semalam"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e06", "input": {"text": "Saya kirim 120000 kemarin sore"}, "gold": {"amount": 120000, "time": "kemarin sore"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e07", "input": {"text": "Transfer 3000000 bulan lalu"}, "gold": {"amount": 3000000, "time": "bulan lalu"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e08", "input": {"text": "Rp45000 ditransfer tadi"}, "gold": {"amount": 45000, "time": "tadi"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e09", "input": {"text": "Transfer dana 880000 kemarin"}, "gold": {"amount": 880000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e10", "input": {"text": "Saya transfer 150000 sekarang"}, "gold": {"amount": 150000, "time": "sekarang"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e11", "input": {"text": "Kirim Rp2.500.000 kemarin"}, "gold": {"amount": 2500000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e12", "input": {"text": "Transfer 67000 tadi malam"}, "gold": {"amount": 67000, "time": "tadi malam"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e13", "input": {"text": "Bayar Rp210.000 kemarin"}, "gold": {"amount": 210000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e14", "input": {"text": "Transfer 999000 minggu ini"}, "gold": {"amount": 999000, "time": "minggu ini"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e15", "input": {"text": "Saya kirim 400000 kemarin"}, "gold": {"amount": 400000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e16", "input": {"text": "Transfer Rp55.000 tadi"}, "gold": {"amount": 55000, "time": "tadi"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e17", "input": {"text": "Kirim 1800000 kemarin pagi"}, "gold": {"amount": 1800000, "time": "kemarin pagi"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e18", "input": {"text": "Transfer 32000 semalam"}, "gold": {"amount": 32000, "time": "semalam"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e19", "input": {"text": "Bayar Rp640.000 kemarin"}, "gold": {"amount": 640000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e20", "input": {"text": "Saya transfer 275000 tadi siang"}, "gold": {"amount": 275000, "time": "tadi siang"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e21", "input": {"text": "Transfer Rp810.000 kemarin"}, "gold": {"amount": 810000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e22", "input": {"text": "Kirim 5000 tadi"}, "gold": {"amount": 5000, "time": "tadi"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e23", "input": {"text": "Transfer 1250000 minggu lalu"}, "gold": {"amount": 1250000, "time": "minggu lalu"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e24", "input": {"text": "Bayar Rp77.000 kemarin"}, "gold": {"amount": 77000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e25", "input": {"text": "Saya transfer 99000 semalam"}, "gold": {"amount": 99000, "time": "semalam"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e26", "input": {"text": "Transfer Rp333.000 kemarin"}, "gold": {"amount": 333000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e27", "input": {"text": "Kirim 420000 tadi pagi"}, "gold": {"amount": 420000, "time": "tadi pagi"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e28", "input": {"text": "Transfer 61000 kemarin"}, "gold": {"amount": 61000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e29", "input": {"text": "Transfer 29000 kemarin"}, "gold": {"amount": 29000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e30", "input": {"text": "Transfer 30000 kemarin"}, "gold": {"amount": 30000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e31", "input": {"text": "Transfer 31000 kemarin"}, "gold": {"amount": 31000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}
+{"sample_id": "e32", "input": {"text": "Transfer 32000 kemarin"}, "gold": {"amount": 32000, "time": "kemarin"}, "meta": {"language": "ind", "split": "smoke", "domain": "transfer"}}

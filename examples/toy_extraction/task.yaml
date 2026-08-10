@@ -1,0 +1,9 @@
+name: toy_transfer_extraction
+task_type: extraction
+targets:
+  - name: amount
+    type: text
+    path: $.amount
+  - name: time
+    type: text
+    path: $.time

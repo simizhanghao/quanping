@@ -8,6 +8,8 @@ source:
 task_spec: ../../examples/indonesian_n2s/task.yaml
 output_spec: ../../examples/indonesian_n2s/output.yaml
 metric_spec: ../../examples/indonesian_n2s/metrics.yaml
+parse:
+  mode: from_parsed
 report:
   primary_target: n2s
   primary_metric: f1

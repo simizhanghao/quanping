@@ -5,6 +5,8 @@ from linguaeval.core.schema import (
     PredictionRecord,
     RunManifest,
     SampleRecord,
+    ScoreRecord,
+    TargetScore,
     TaskSpec,
 )
 
@@ -15,5 +17,7 @@ __all__ = [
     "MetricSpec",
     "ModelSpec",
     "PredictionRecord",
+    "ScoreRecord",
+    "TargetScore",
     "RunManifest",
 ]

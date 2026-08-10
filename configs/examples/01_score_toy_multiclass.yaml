@@ -7,6 +7,8 @@ source:
 task_spec: ../../examples/toy_multiclass/task.yaml
 output_spec: ../../examples/toy_multiclass/output.yaml
 metric_spec: ../../examples/toy_multiclass/metrics.yaml
+parse:
+  mode: from_parsed
 report:
   primary_target: intent_class
   primary_metric: macro_f1

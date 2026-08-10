@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
@@ -11,9 +12,19 @@ import yaml
 from linguaeval.adapters.dataset.jsonl_samples import write_predictions_jsonl
 from linguaeval.adapters.dataset.registry import get_adapter
 from linguaeval.core.manifest import write_json, write_manifest
-from linguaeval.core.schema import MetricSpec, OutputSpec, PredictionRecord, RunManifest, SampleRecord, TaskSpec
+from linguaeval.core.schema import (
+    MetricSpec,
+    OutputSpec,
+    PredictionRecord,
+    RunManifest,
+    SampleRecord,
+    ScoreRecord,
+    TaskSpec,
+)
 from linguaeval.metrics.aggregate import build_business_metrics
 from linguaeval.metrics.classification import score_targets
+from linguaeval.metrics.score_records import build_score_records
+from linguaeval.parse.pipeline import apply_output_spec
 from linguaeval.reports.markdown import write_report_md
 
 
@@ -61,12 +72,34 @@ def load_samples_and_preds(
     return adapter(source, root, cfg)
 
 
+def _write_scores_jsonl(path: Path, scores: List[ScoreRecord]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        for s in scores:
+            f.write(json.dumps(s.to_dict(), ensure_ascii=False) + "\n")
+
+
 def run_offline_score(config_path: Path) -> Path:
-    cfg, task, _output, metric_spec = load_bundle(config_path)
+    cfg, task, output_spec, metric_spec = load_bundle(config_path)
     samples, preds = load_samples_and_preds(cfg, config_path)
 
+    parse_mode = (
+        (cfg.get("parse") or {}).get("mode")
+        or cfg.get("prediction_mode")
+        or "from_parsed"
+    )
+    if parse_mode not in {"from_raw", "from_parsed"}:
+        raise ValueError(f"Unsupported parse.mode={parse_mode!r}; use from_raw|from_parsed")
+
+    preds = apply_output_spec(preds, output_spec, mode=parse_mode)
+    score_rows = build_score_records(samples, preds, task)
     scored = score_targets(samples, preds, task, metric_spec)
     business = build_business_metrics(scored, report_cfg=cfg.get("report") or {})
+    business["parse"] = {
+        "mode": parse_mode,
+        "parser": output_spec.parser,
+        "format": output_spec.format,
+    }
 
     out_dir_raw = cfg.get("output_dir") or "results/01_eval_offline"
     out_dir = Path(out_dir_raw)
@@ -91,26 +124,38 @@ def run_offline_score(config_path: Path) -> Path:
         notes={
             "mode": "offline_score",
             "adapter": adapter_name,
+            "parse_mode": parse_mode,
             "n_samples": len(samples),
             "n_predictions": len(preds),
+            "n_score_records": len(score_rows),
             "task": task.name,
             "report": cfg.get("report") or {},
         },
     )
 
     pred_out = out_dir / "predictions.jsonl"
+    scores_out = out_dir / "scores.jsonl"
     write_predictions_jsonl(pred_out, preds)
+    _write_scores_jsonl(scores_out, score_rows)
     business_path = out_dir / "business_metrics.json"
     schema_path = out_dir / "schema_metrics.json"
     report_path = out_dir / "report.md"
     manifest_path = out_dir / "manifest.json"
 
     write_json(business_path, business)
-    write_json(schema_path, business.get("schema") or {})
+    write_json(
+        schema_path,
+        {
+            **(business.get("schema") or {}),
+            "parse_mode": parse_mode,
+            "parser": output_spec.parser,
+        },
+    )
     write_report_md(report_path, business=business, manifest=manifest.to_dict())
 
     manifest.artifact_index = {
         "predictions": str(pred_out),
+        "scores": str(scores_out),
         "business_metrics": str(business_path),
         "schema_metrics": str(schema_path),
         "report": str(report_path),

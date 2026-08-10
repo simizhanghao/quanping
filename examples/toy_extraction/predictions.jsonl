@@ -1,0 +1,32 @@
+{"sample_id": "e01", "model_id": "toy_extract", "raw_output": "{\"amount\": 500000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e02", "model_id": "toy_extract", "raw_output": "{\"amount\": 250000, \"time\": \"tadi pagi\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e03", "model_id": "toy_extract", "raw_output": "{\"amount\": 1000000, \"time\": \"minggu lalu\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e04", "model_id": "toy_extract", "raw_output": "{\"amount\": 75000, \"time\": \"hari ini\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e05", "model_id": "toy_extract", "raw_output": "{\"amount\": 90001, \"time\": \"semalam\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e06", "model_id": "toy_extract", "raw_output": "{\"amount\": 120000, \"time\": \"kemarin sore\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e07", "model_id": "toy_extract", "raw_output": "{\"amount\": 3000000, \"time\": \"bulan lalu\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e08", "model_id": "toy_extract", "raw_output": "{\"amount\": 45000, \"time\": \"tadi\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e09", "model_id": "toy_extract", "raw_output": "{\"amount\": 880000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e10", "model_id": "toy_extract", "raw_output": "{\"amount\": 150000, \"time\": \"besok\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e11", "model_id": "toy_extract", "raw_output": "{\"amount\": 2500000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e12", "model_id": "toy_extract", "raw_output": "{\"amount\": 67000, \"time\": \"tadi malam\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e13", "model_id": "toy_extract", "raw_output": "{\"amount\": 210000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e14", "model_id": "toy_extract", "raw_output": "{\"amount\": 999000, \"time\": \"minggu ini\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e15", "model_id": "toy_extract", "raw_output": "{\"amount\": 400000}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e16", "model_id": "toy_extract", "raw_output": "{\"amount\": 55000, \"time\": \"tadi\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e17", "model_id": "toy_extract", "raw_output": "{\"amount\": 1800000, \"time\": \"kemarin pagi\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e18", "model_id": "toy_extract", "raw_output": "{\"amount\": 32000, \"time\": \"semalam\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e19", "model_id": "toy_extract", "raw_output": "{\"amount\": 640000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e20", "model_id": "toy_extract", "raw_output": "{amount: not-json", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e21", "model_id": "toy_extract", "raw_output": "{\"amount\": 810000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e22", "model_id": "toy_extract", "raw_output": "{\"amount\": 5000, \"time\": \"tadi\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e23", "model_id": "toy_extract", "raw_output": "{\"amount\": 1250000, \"time\": \"minggu lalu\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e24", "model_id": "toy_extract", "raw_output": "{\"amount\": 77000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e25", "model_id": "toy_extract", "raw_output": "{\"amount\": \"99000\", \"time\": \"semalam\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e26", "model_id": "toy_extract", "raw_output": "{\"amount\": 333000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e27", "model_id": "toy_extract", "raw_output": "{\"amount\": 420000, \"time\": \"tadi pagi\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e28", "model_id": "toy_extract", "raw_output": "{\"amount\": 61000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e29", "model_id": "toy_extract", "raw_output": "{\"amount\": 29000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e30", "model_id": "toy_extract", "raw_output": "{\"amount\": 30000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e31", "model_id": "toy_extract", "raw_output": "{\"amount\": 31000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "e32", "model_id": "toy_extract", "raw_output": "{\"amount\": 32000, \"time\": \"kemarin\"}", "parsed": {}, "format": {"parse_ok": true, "schema_ok": true}}

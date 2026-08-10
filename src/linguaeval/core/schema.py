@@ -199,6 +199,45 @@ class PredictionRecord:
 
 
 @dataclass
+class TargetScore:
+    """Per-target sample-level score (generic; target name comes from TaskSpec)."""
+
+    gold: Any = None
+    pred: Any = None
+    correct: Optional[bool] = None
+    applicable: bool = True
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ScoreRecord:
+    """Sample-level evaluation record between Prediction and Aggregator."""
+
+    sample_id: str
+    model_id: str = "default"
+    targets: Dict[str, TargetScore] = field(default_factory=dict)
+    parse_ok: bool = True
+    schema_ok: bool = True
+    joint_success: Optional[bool] = None
+    slices: Dict[str, Any] = field(default_factory=dict)
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "sample_id": self.sample_id,
+            "model_id": self.model_id,
+            "targets": {k: v.to_dict() for k, v in self.targets.items()},
+            "parse_ok": self.parse_ok,
+            "schema_ok": self.schema_ok,
+            "joint_success": self.joint_success,
+            "slices": self.slices,
+            "meta": self.meta,
+        }
+
+
+@dataclass
 class RunManifest:
     run_id: str
     created_at: str = field(default_factory=_utc_now_iso)

@@ -61,6 +61,32 @@ Target types (v0): `binary`, `multiclass`, `text`.
 | usage / timing | object | |
 | error | str\|null | |
 
-## 7. RunManifest
+## 7. ScoreRecord (P0.5-B)
+
+Sample-level bridge between Prediction and Aggregator:
+
+| Field | Notes |
+|-------|------|
+| sample_id / model_id | |
+| targets.\<name\> | `{gold, pred, correct, applicable}` — names from TaskSpec |
+| parse_ok / schema_ok | from OutputSpec pipeline |
+| joint_success | all applicable targets correct |
+| slices | optional diagnostics keys from meta/conversation |
+
+## 8. Parse modes
+
+| Mode | Behavior |
+|------|----------|
+| `from_parsed` | Validate existing `parsed` (legacy N2S replay) |
+| `from_raw` | `raw_output` → Parser → Validator → `parsed` |
+
+Config:
+
+```yaml
+parse:
+  mode: from_raw   # or from_parsed
+```
+
+## 9. RunManifest
 
 run_id, created_at, config_path, packs, artifact_index, notes.

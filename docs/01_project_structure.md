@@ -241,7 +241,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   └── examples/
 │       ├── 01_score_toy_multiclass.yaml
 │       ├── 02_score_toy_metric_swap.yaml
-│       └── 03_score_n2s_offline_replay.yaml
+│       ├── 03_score_n2s_offline_replay.yaml
+│       └── 04_score_json_extraction.yaml
 │
 ├── src/linguaeval/
 │   ├── __init__.py
