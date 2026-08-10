@@ -237,7 +237,9 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 02_core_contracts.md          # 字段级冻结
 │   ├── 03_metric_denominators.md     # coverage / semantic / strict
 │   ├── 04_paired_regression_p1a.md   # baseline/candidate compare (P1-A)
-│   └── 05_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 05_bootstrap_statistics_p1b.md
+│   ├── 06_slices_and_gates_p1c.md
+│   └── 07_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -366,8 +368,8 @@ LlamaFactory/tests/yewupingce/n2s_test/
 | Slice | Goal |
 |-------|------|
 | **A** | `baseline`/`candidate` align + ComparisonRecord + 4-cell + mini metric Δ + cases（见 `docs/04_paired_regression_p1a.md`） |
-| **B** | paired / cluster bootstrap CI |
-| **C** | fixed slices + CI-aware gate + retention report |
+| **B** | paired / cluster bootstrap CI（见 `docs/05_bootstrap_statistics_p1b.md`） |
+| **C** | fixed slices + CI-aware gate（见 `docs/06_slices_and_gates_p1c.md`） |
 
 **P1 不做：** IndoMMLU 接入、鲁棒扰动、自动 slice discovery。
 
@@ -462,9 +464,11 @@ README 必须分两表：
 | 2 | `docs/02_core_contracts.md` | Contract 字段级冻结（含 ScoreRecord / provenance） |
 | 3 | `docs/03_metric_denominators.md` | coverage / semantic / strict（P0.5-C） |
 | 4 | `docs/04_paired_regression_p1a.md` | baseline/candidate paired kernel（P1-A） |
-| 5 | Offline kernel + compare configs `05_`/`06_` | P0.5 + P1-A 验收 |
-| 6 | P1-B/C Statistics + slices + gate | 下一步 |
-| 7 | `docs/05_dimension_contracts.md` | D0–D10 各一页 Contract（planned） |
+| 5 | `docs/05_bootstrap_statistics_p1b.md` | paired / cluster bootstrap CI（P1-B） |
+| 6 | `docs/06_slices_and_gates_p1c.md` | fixed slices + CI-aware gate（P1-C） |
+| 7 | Offline kernel + compare configs `05_`/`06_` | P0.5 + P1 验收 |
+| 8 | P1.5 Calibration | 下一步主线之一 |
+| 9 | `docs/07_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）
 

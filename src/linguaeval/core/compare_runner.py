@@ -16,7 +16,10 @@ from linguaeval.compare.aggregate import (
     write_transition_cases,
 )
 from linguaeval.compare.alignment import AlignmentError, index_by_id, require_strict_alignment
+from linguaeval.compare.bootstrap import build_pair_rows, run_paired_bootstrap
+from linguaeval.compare.gates import evaluate_gates
 from linguaeval.compare.report import write_compare_report_md
+from linguaeval.compare.slices import build_slice_comparison
 from linguaeval.compare.transitions import build_comparison_records
 from linguaeval.core.fingerprint import build_provenance, fingerprint_records
 from linguaeval.core.manifest import write_json, write_manifest
@@ -169,6 +172,77 @@ def run_offline_compare(config_path: Path) -> Path:
     biz_c = build_business_metrics(scored_c, report_cfg=report_cfg)
     deltas = metric_deltas(biz_b, biz_c, target=str(target))
 
+    target_spec = next(t for t in task.targets if t.name == target)
+    stats_cfg = dict(cfg.get("statistics") or {})
+    slices_cfg = dict(cfg.get("slices") or {})
+    bootstrap_unit = str(stats_cfg.get("bootstrap_unit") or "sample")
+    metric_names = list(
+        stats_cfg.get("metrics")
+        or slices_cfg.get("metrics")
+        or metric_spec.metrics.get(str(target))
+        or []
+    )
+    metric_names = [
+        m
+        for m in metric_names
+        if str(m).lower()
+        in {
+            "precision",
+            "recall",
+            "f1",
+            "accuracy",
+            "macro_f1",
+            "exact_match",
+        }
+    ]
+    if not metric_names and report_cfg.get("primary_metric"):
+        metric_names = [str(report_cfg["primary_metric"])]
+
+    pair_rows = build_pair_rows(
+        samples_aligned,
+        scores_b,
+        scores_c,
+        records,
+        target=str(target),
+        bootstrap_unit=bootstrap_unit,
+        denominator=denominator,
+    )
+
+    statistics: Optional[Dict[str, Any]] = None
+    if bool(stats_cfg.get("enabled", False)):
+        statistics = {
+            "enabled": True,
+            "bootstrap_unit": bootstrap_unit,
+            **run_paired_bootstrap(
+                pair_rows,
+                target_type=target_spec.type,
+                metric_names=metric_names,
+                n_bootstrap=int(stats_cfg.get("n_bootstrap") or 1000),
+                confidence_level=float(
+                    stats_cfg.get("confidence_level") or stats_cfg.get("ci") or 0.95
+                ),
+                seed=int(stats_cfg.get("seed") or 42),
+                labels=target_spec.labels,
+                round_digits=metric_spec.round_digits,
+            ),
+        }
+
+    slice_comparison: Optional[Dict[str, Any]] = None
+    if bool(slices_cfg.get("enabled", False)):
+        slice_comparison = build_slice_comparison(
+            samples_aligned,
+            scores_b,
+            scores_c,
+            pair_rows,
+            target=str(target),
+            target_type=target_spec.type,
+            metric_names=metric_names or [str(report_cfg.get("primary_metric") or "accuracy")],
+            slice_specs=list(slices_cfg.get("specs") or []),
+            labels=target_spec.labels,
+            round_digits=metric_spec.round_digits,
+            min_support=int(slices_cfg.get("min_support") or 1),
+        )
+
     comparison_metrics: Dict[str, Any] = {
         "compare": {
             "target": target,
@@ -178,6 +252,8 @@ def run_offline_compare(config_path: Path) -> Path:
         },
         "transitions": summarize_transitions(tcounts),
         "metric_deltas": deltas,
+        "statistics": statistics,
+        "slices": slice_comparison,
         "baseline_business": {
             "primary": biz_b.get("primary"),
             "targets": {str(target): (biz_b.get("targets") or {}).get(target)},
@@ -189,6 +265,12 @@ def run_offline_compare(config_path: Path) -> Path:
             "schema": biz_c.get("schema"),
         },
     }
+
+    gate_result: Optional[Dict[str, Any]] = None
+    gate_specs = list(cfg.get("gates") or [])
+    if gate_specs:
+        gate_result = evaluate_gates(comparison_metrics, gate_specs)
+        comparison_metrics["gate"] = gate_result
 
     out_dir = _resolve_out_dir(config_path, cfg.get("output_dir") or "results/05_compare_offline")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -247,6 +329,15 @@ def run_offline_compare(config_path: Path) -> Path:
         },
     )
     write_json(metrics_path, comparison_metrics)
+    stats_path = out_dir / "statistics.json"
+    if statistics is not None:
+        write_json(stats_path, statistics)
+    slices_path = out_dir / "slice_comparison.json"
+    if slice_comparison is not None:
+        write_json(slices_path, slice_comparison)
+    gate_path = out_dir / "gate.json"
+    if gate_result is not None:
+        write_json(gate_path, gate_result)
     write_compare_report_md(
         report_path, metrics=comparison_metrics, manifest=manifest.to_dict()
     )
@@ -258,6 +349,15 @@ def run_offline_compare(config_path: Path) -> Path:
         "report": str(report_path),
         **{f"{k}_cases": v for k, v in case_paths.items()},
     }
+    if statistics is not None:
+        manifest.artifact_index["statistics"] = str(stats_path)
+    if slice_comparison is not None:
+        manifest.artifact_index["slice_comparison"] = str(slices_path)
+    if gate_result is not None:
+        manifest.artifact_index["gate"] = str(gate_path)
+    manifest.notes["statistics_enabled"] = bool(statistics)
+    manifest.notes["slices_enabled"] = bool(slice_comparison)
+    manifest.notes["gate_status"] = (gate_result or {}).get("status")
     write_manifest(out_dir / "manifest.json", manifest)
     # keep side business dumps for debugging
     write_json(out_dir / "baseline_business_metrics.json", biz_b)

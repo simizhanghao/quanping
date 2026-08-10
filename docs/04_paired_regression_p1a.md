@@ -29,7 +29,7 @@ Roles are **`baseline` / `candidate`** (not hardcoded Base/SFT). Display names m
 | Q6 | Artifacts `05_` / `06_` |
 | Q7 | `applicable=false` excluded from 4-cell; audit only |
 
-**Out of P1-A:** bootstrap CI, cluster bootstrap, fixed slices, CI-aware gate, IndoMMLU.
+**Out of P1-A (done in later slices):** bootstrap CI / cluster → `docs/05_bootstrap_statistics_p1b.md`（P1-B）；fixed slices + CI-aware gate（P1-C）；IndoMMLU.
 
 ## Denominator
 

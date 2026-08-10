@@ -52,6 +52,63 @@ def write_compare_report_md(
             "",
             f"Primary `{primary.get('metric')}` Δ = {primary.get('delta')}",
         ]
+
+    stats = metrics.get("statistics") or {}
+    if stats.get("enabled"):
+        lines += [
+            "",
+            "## Statistics (bootstrap CI)",
+            "",
+            f"- bootstrap_unit: `{stats.get('bootstrap_unit')}`",
+            f"- n_units: {stats.get('n_units')} (rows={stats.get('n_rows')}, "
+            f"cluster_mode={stats.get('cluster_mode')})",
+            f"- n_bootstrap: {stats.get('n_bootstrap')}",
+            f"- confidence_level: {stats.get('confidence_level')}",
+            "",
+        ]
+        for name, block in (stats.get("metrics") or {}).items():
+            d = block.get("delta") or {}
+            lines.append(
+                f"- Δ`{name}`: {d.get('point')}  "
+                f"CI=[{d.get('ci_low')}, {d.get('ci_high')}]"
+            )
+        net = (stats.get("transitions") or {}).get("net_gain") or {}
+        if net:
+            lines.append(
+                f"- net_gain: {net.get('point')}  "
+                f"CI=[{net.get('ci_low')}, {net.get('ci_high')}]"
+            )
+
+    slices = (metrics.get("slices") or {}).get("slices") or {}
+    if slices:
+        lines += ["", "## Fixed slices", ""]
+        for sname, sblock in slices.items():
+            lines.append(f"### `{sname}` (source={sblock.get('source')})")
+            for key, vblock in (sblock.get("values") or {}).items():
+                # show primary-ish first metric
+                mets = vblock.get("metrics") or {}
+                m0 = next(iter(mets), None)
+                if m0:
+                    mb = mets[m0]
+                    lines.append(
+                        f"- `{key}` n={vblock.get('support')}: "
+                        f"{m0} {mb.get('baseline')} → {mb.get('candidate')} "
+                        f"(Δ={mb.get('delta')}; net_gain={((vblock.get('transitions') or {}).get('net_gain'))})"
+                    )
+                else:
+                    lines.append(f"- `{key}` n={vblock.get('support')}")
+            lines.append("")
+
+    gate = metrics.get("gate") or {}
+    if gate:
+        lines += ["## Gate", "", f"- status: `{gate.get('status')}`", ""]
+        for g in gate.get("gates") or []:
+            lines.append(
+                f"- `{g.get('id')}`: {g.get('status')} — {g.get('detail')} "
+                f"(path=`{g.get('path')}`)"
+            )
+        lines.append("")
+
     lines += [
         "",
         "## Provenance",

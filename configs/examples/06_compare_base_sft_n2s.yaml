@@ -25,4 +25,41 @@ compare:
 report:
   primary_target: n2s
   primary_metric: f1
+statistics:
+  enabled: true
+  n_bootstrap: 1000
+  confidence_level: 0.95
+  seed: 42
+  # N2S turns are nested under dialogue — cluster, do not treat turns as i.i.d.
+  bootstrap_unit: dialogue_id
+  metrics: [precision, recall, f1]
+slices:
+  enabled: true
+  min_support: 30
+  specs:
+    - name: language
+      source: meta.language
+    - name: gold_n2s
+      source: target.gold
+    - name: turn_bucket
+      source: conversation.turn_id
+      buckets: [3, 10, 30, 100000]
+      labels: [early, mid, late, very_late]
+    - name: format_both_ok
+      source: format.both_ok
+    - name: routing_skill
+      source: gold.routing_skill
+gates:
+  - id: candidate_f1_min
+    path: candidate_business.primary.value
+    op: ">="
+    value: 0.75
+  - id: delta_f1_min
+    path: metric_deltas.metrics.f1.delta
+    op: ">="
+    value: 0
+  - id: delta_f1_ci_lower
+    path: statistics.metrics.f1.delta.ci_low
+    op: ">="
+    value: 0
 output_dir: results/06_compare_base_sft_n2s

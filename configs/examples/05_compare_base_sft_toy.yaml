@@ -25,4 +25,34 @@ compare:
 report:
   primary_target: intent_class
   primary_metric: accuracy
+statistics:
+  enabled: true
+  n_bootstrap: 200
+  confidence_level: 0.95
+  seed: 42
+  bootstrap_unit: sample
+  metrics: [accuracy, macro_f1]
+slices:
+  enabled: true
+  min_support: 1
+  specs:
+    - name: language
+      source: meta.language
+    - name: gold_label
+      source: target.gold
+    - name: input_length
+      source: input.text.length
+      buckets: [12, 20, 100000]
+      labels: [short, medium, long]
+gates:
+  # Toy n=32: CI lower can cross 0 by noise — gate on point Δ here.
+  # CI-aware gate is demonstrated on the N2S example (06).
+  - id: candidate_accuracy_min
+    path: candidate_business.primary.value
+    op: ">="
+    value: 0.5
+  - id: delta_accuracy_min
+    path: metric_deltas.metrics.accuracy.delta
+    op: ">="
+    value: 0
 output_dir: results/05_compare_base_sft_toy
