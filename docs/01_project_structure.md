@@ -431,15 +431,18 @@ LlamaFactory/tests/yewupingce/n2s_test/
 | **A** | LanguagePack Contract + Registry + inspect（`ind`/`arb` fixtures） | done |
 | **B** | Belebele-format parallel reading matrix（换语言不换 Kernel） | done |
 | **C** | Native Indonesian（IndoMMLU → COPAL-ID format fixtures） | done |
-| **D** | lm-eval adapter → PredictionRecord（`--log_samples`，无 lm_eval 依赖） | done |
+| **D** | lm-eval **MC** adapter → PredictionRecord（`--log_samples`，无 lm_eval 依赖） | done |
 | **E** | Cross-language × capability Base↔Candidate report + gates | done |
+| **F** | Hardening：`primary_metric` + 复用 P1 paired/bootstrap + encoding + real Base/SFT | done (F-D run for real numbers) |
 
-### P4 — Safety + Production
+### P4 — Production first, then Safety（P3-F 完成后）
 
-- D9 SafetyPack  
-- 完整 D10 protocol（warmup/concurrency/comparable flag）  
-- GateEngine 泛化 + CI smoke  
-- HTML 最后再说  
+| Slice | Goal |
+|-------|------|
+| **A** | OpenAI-compatible ModelAdapter（优先覆盖 vLLM） |
+| **B** | Production Profiler（warmup/concurrency/TTFT/TPOT/E2E/goodput/VRAM） |
+| **C** | SafetyPack（Unsafe Compliance / Over-refusal / Safe Completion；可接 IndoSafety） |
+| **D** | Unified Release Card + Gate 泛化（无万能总分） |
 
 ---
 

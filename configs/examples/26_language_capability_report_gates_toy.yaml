@@ -10,6 +10,16 @@ parse:
 report:
   primary_target: answer
   primary_metric: accuracy
+compare:
+  target: answer
+  denominator: semantic
+statistics:
+  enabled: true
+  n_bootstrap: 200
+  confidence_level: 0.95
+  seed: 42
+  bootstrap_unit: sample
+  metrics: [accuracy]
 languages:
   ind:
     samples: ../../examples/toy_belebele/ind_Latn.jsonl
@@ -26,13 +36,26 @@ languages:
     candidate:
       predictions: ../../examples/toy_belebele/predictions_arb_sft.jsonl
 # Target language (ind) must not regress; other language (arb) drop bounded.
+# CI gates reuse P1-D min_samples → INSUFFICIENT_SUPPORT on toy n.
 gates:
   - id: target_ind_reading_min_gain
-    path: language_regression.by_capability.reading_comprehension.by_language.ind.delta_accuracy
+    path: language_regression.by_capability.reading_comprehension.by_language.ind.delta
     op: ">="
     value: 0.0
   - id: other_arb_reading_max_drop
-    path: language_regression.by_capability.reading_comprehension.by_language.arb.delta_accuracy
+    path: language_regression.by_capability.reading_comprehension.by_language.arb.delta
     op: ">="
     value: -0.05
+  - id: target_ind_delta_ci_lower
+    path: language_regression.by_capability.reading_comprehension.by_language.ind.delta_ci_low
+    op: ">="
+    value: 0.0
+    requirements:
+      min_samples: 500
+  - id: other_arb_delta_ci_lower
+    path: language_regression.by_capability.reading_comprehension.by_language.arb.delta_ci_low
+    op: ">="
+    value: -0.05
+    requirements:
+      min_samples: 500
 output_dir: results/26_language_capability_report_gates_toy

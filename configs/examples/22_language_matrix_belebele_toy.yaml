@@ -10,6 +10,16 @@ parse:
 report:
   primary_target: answer
   primary_metric: accuracy
+compare:
+  target: answer
+  denominator: semantic
+statistics:
+  enabled: true
+  n_bootstrap: 200
+  confidence_level: 0.95
+  seed: 42
+  bootstrap_unit: sample
+  metrics: [accuracy]
 languages:
   ind:
     samples: ../../examples/toy_belebele/ind_Latn.jsonl

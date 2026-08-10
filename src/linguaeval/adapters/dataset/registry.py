@@ -56,4 +56,6 @@ def ensure_builtin_adapters() -> None:
     register_adapter("indommlu_jsonl", native_mc.load_indommlu_from_config)
     register_adapter("copal_jsonl", native_mc.load_copal_from_config)
     register_adapter("lm_eval_samples", lm_eval_samples.load_from_config)
+    # Preferred alias — same MC-only loader (generation not supported).
+    register_adapter("lm_eval_mc_samples", lm_eval_samples.load_from_config)
     _BUILTINS_LOADED = True

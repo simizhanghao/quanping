@@ -8,3 +8,10 @@ Not full IndoMMLU / COPAL-ID downloads — format-compatible fixtures only.
 | cultural_reasoning | `copal_jsonl` | 0.75 → 1.0 (Δ+0.25) |
 
 Provenance: `native_authored=true` (contrast Belebele parallel).
+
+Required encodings:
+
+```yaml
+indommlu_jsonl: answer_encoding: letter
+copal_jsonl:    answer_encoding: zero_based_index   # label 0/1 → A/B
+```

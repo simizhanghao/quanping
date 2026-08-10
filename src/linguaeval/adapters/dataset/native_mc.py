@@ -1,6 +1,7 @@
 """Native-authored MC adapters (IndoMMLU-style / COPAL-style).
 
 Provenance is taken from config — Kernel does not hardcode Indonesian business.
+Gold labels require explicit ``answer_encoding`` (no 0/1-based guessing).
 """
 
 from __future__ import annotations
@@ -9,9 +10,12 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from linguaeval.adapters.dataset.answer_encoding import (
+    AnswerEncodingError,
+    as_mc_letter,
+    require_answer_encoding,
+)
 from linguaeval.core.schema import FormatStatus, PredictionRecord, SampleInput, SampleRecord
-
-_LETTER = {0: "A", 1: "B", 2: "C", 3: "D", 4: "E"}
 
 
 def _resolve(base: Path, maybe: Optional[str]) -> Optional[Path]:
@@ -19,20 +23,6 @@ def _resolve(base: Path, maybe: Optional[str]) -> Optional[Path]:
         return None
     p = Path(maybe)
     return p if p.is_absolute() else (base / p).resolve()
-
-
-def _as_letter(raw: Any) -> str:
-    if isinstance(raw, str) and raw.strip().upper() in {"A", "B", "C", "D", "E"}:
-        return raw.strip().upper()
-    try:
-        n = int(str(raw).strip())
-    except (TypeError, ValueError) as e:
-        raise ValueError(f"invalid answer label={raw!r}") from e
-    if n in _LETTER:
-        return _LETTER[n]
-    if 1 <= n <= 5:
-        return _LETTER[n - 1]
-    raise ValueError(f"answer label out of range: {n}")
 
 
 def _load_preds(path: Path) -> List[PredictionRecord]:
@@ -71,6 +61,7 @@ def indommlu_row_to_sample(
     language: str,
     benchmark_id: str,
     capability: str,
+    answer_encoding: str,
 ) -> SampleRecord:
     """IndoMMLU-ish: question + options A-D + answer letter/index."""
     sid = str(row.get("sample_id") or row.get("id") or row.get("link") or "")
@@ -88,7 +79,8 @@ def indommlu_row_to_sample(
             if val is not None:
                 opts.append(f"{letter}. {val}")
         body = "\n".join(opts)
-    gold = _as_letter(row.get("answer") if row.get("answer") is not None else row.get("correct_answer"))
+    raw_gold = row.get("answer") if row.get("answer") is not None else row.get("correct_answer")
+    gold = as_mc_letter(raw_gold, encoding=answer_encoding)
     text = f"{question}\n\n{body}".strip() if body else question
     return SampleRecord(
         sample_id=sample_id,
@@ -98,6 +90,7 @@ def indommlu_row_to_sample(
             "language": language,
             "benchmark_id": benchmark_id,
             "capability": capability,
+            "answer_encoding": answer_encoding,
             "subject": row.get("subject") or row.get("topic"),
             "provenance": {
                 "origin": "native_authored",
@@ -115,8 +108,9 @@ def copal_row_to_sample(
     language: str,
     benchmark_id: str,
     capability: str,
+    answer_encoding: str,
 ) -> SampleRecord:
-    """COPAL-ID-ish: premise + choice1/choice2 + label 0/1 → A/B."""
+    """COPAL-ID-ish: premise + choice1/choice2 + label index → A/B."""
     sid = str(row.get("sample_id") or row.get("id") or "")
     if not sid:
         raise ValueError("copal row requires sample_id|id")
@@ -127,10 +121,9 @@ def copal_row_to_sample(
     label = row.get("label")
     if label is None:
         label = row.get("answer")
-    gold = _as_letter(label)
+    gold = as_mc_letter(label, encoding=answer_encoding)
     if gold not in {"A", "B"}:
-        # map 0/1 already handled; reject C+
-        raise ValueError(f"copal expects binary label, got {gold}")
+        raise AnswerEncodingError(f"copal expects binary label mapped to A/B, got {gold}")
     text = f"{premise}\n\nA. {c1}\nB. {c2}".strip()
     return SampleRecord(
         sample_id=sample_id,
@@ -140,6 +133,7 @@ def copal_row_to_sample(
             "language": language,
             "benchmark_id": benchmark_id,
             "capability": capability,
+            "answer_encoding": answer_encoding,
             "variant": row.get("variant") or row.get("dialect"),
             "provenance": {
                 "origin": "native_authored",
@@ -151,6 +145,15 @@ def copal_row_to_sample(
     )
 
 
+def _resolve_encoding(source: Dict[str, Any], cfg: Dict[str, Any], *, where: str) -> str:
+    return require_answer_encoding(
+        source.get("answer_encoding")
+        if source.get("answer_encoding") is not None
+        else cfg.get("answer_encoding"),
+        where=where,
+    )
+
+
 def _load_indommlu(
     source: Dict[str, Any],
     config_dir: Path,
@@ -159,6 +162,7 @@ def _load_indommlu(
     samples_path = _resolve(config_dir, source.get("samples") or cfg.get("samples"))
     if not samples_path or not samples_path.is_file():
         raise FileNotFoundError(f"indommlu samples not found: {samples_path}")
+    encoding = _resolve_encoding(source, cfg, where="indommlu answer_encoding")
     language = str(source.get("language") or cfg.get("language") or "ind").strip().lower()
     benchmark_id = str(source.get("benchmark_id") or cfg.get("benchmark_id") or "indommlu")
     capability = str(source.get("capability") or cfg.get("capability") or "local_knowledge")
@@ -174,6 +178,7 @@ def _load_indommlu(
                     language=language,
                     benchmark_id=benchmark_id,
                     capability=capability,
+                    answer_encoding=encoding,
                 )
             )
     preds_path = _resolve(config_dir, source.get("predictions") or cfg.get("predictions"))
@@ -189,6 +194,7 @@ def _load_copal(
     samples_path = _resolve(config_dir, source.get("samples") or cfg.get("samples"))
     if not samples_path or not samples_path.is_file():
         raise FileNotFoundError(f"copal samples not found: {samples_path}")
+    encoding = _resolve_encoding(source, cfg, where="copal answer_encoding")
     language = str(source.get("language") or cfg.get("language") or "ind").strip().lower()
     benchmark_id = str(source.get("benchmark_id") or cfg.get("benchmark_id") or "copal_id")
     capability = str(source.get("capability") or cfg.get("capability") or "cultural_reasoning")
@@ -204,6 +210,7 @@ def _load_copal(
                     language=language,
                     benchmark_id=benchmark_id,
                     capability=capability,
+                    answer_encoding=encoding,
                 )
             )
     preds_path = _resolve(config_dir, source.get("predictions") or cfg.get("predictions"))
@@ -211,7 +218,6 @@ def _load_copal(
     return samples, preds
 
 
-# public adapter entrypoints
 def load_indommlu_from_config(
     source: Dict[str, Any], config_dir: Path, cfg: Dict[str, Any]
 ) -> Tuple[List[SampleRecord], List[PredictionRecord]]:

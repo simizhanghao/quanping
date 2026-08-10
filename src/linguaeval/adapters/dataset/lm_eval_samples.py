@@ -1,8 +1,14 @@
-"""lm-eval `--log_samples` → SampleRecord + PredictionRecord.
+"""lm-eval **multiple-choice** `--log_samples` → SampleRecord + PredictionRecord.
 
-lm-eval remains an external executor. This adapter only converts sample dumps
+Scope (P3-D / P3-F-C): **MC tasks only**. Generation / free-form lm-eval dumps are
+out of scope — use a future ``lm_eval_generation_samples`` adapter.
+
+lm-eval remains an external executor. This adapter only converts MC sample dumps
 into LinguaEval contracts so Kernel scorers/regression can be reused.
-Does not import or depend on the `lm_eval` package.
+Does not import or depend on the ``lm_eval`` package.
+
+Requires explicit ``answer_encoding``: ``letter`` | ``zero_based_index`` |
+``one_based_index``.
 """
 
 from __future__ import annotations
@@ -11,9 +17,15 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from linguaeval.adapters.dataset.answer_encoding import (
+    AnswerEncodingError,
+    as_mc_letter,
+    require_answer_encoding,
+)
 from linguaeval.core.schema import FormatStatus, PredictionRecord, SampleInput, SampleRecord
 
-_LETTER = {0: "A", 1: "B", 2: "C", 3: "D", 4: "E"}
+ADAPTER_KIND = "multiple_choice"
+ADAPTER_NAMES = ("lm_eval_samples", "lm_eval_mc_samples")
 
 
 def _resolve(base: Path, maybe: Optional[str]) -> Optional[Path]:
@@ -21,34 +33,6 @@ def _resolve(base: Path, maybe: Optional[str]) -> Optional[Path]:
         return None
     p = Path(maybe)
     return p if p.is_absolute() else (base / p).resolve()
-
-
-def _as_letter(raw: Any) -> str:
-    if raw is None:
-        raise ValueError("empty answer/target")
-    if isinstance(raw, (list, tuple)) and raw:
-        raw = raw[0]
-        if isinstance(raw, (list, tuple)) and raw:
-            raw = raw[0]
-    if isinstance(raw, str):
-        s = raw.strip()
-        if not s:
-            raise ValueError("empty answer string")
-        # take first char if "A. something"
-        head = s[0].upper()
-        if head in {"A", "B", "C", "D", "E"}:
-            return head
-        if s.upper() in {"A", "B", "C", "D", "E"}:
-            return s.upper()
-    try:
-        n = int(str(raw).strip())
-    except (TypeError, ValueError) as e:
-        raise ValueError(f"cannot map answer={raw!r} to letter") from e
-    if n in _LETTER:
-        return _LETTER[n]
-    if 1 <= n <= 5:
-        return _LETTER[n - 1]
-    raise ValueError(f"answer index out of range: {n}")
 
 
 def _prompt_text(sample: Dict[str, Any]) -> str:
@@ -67,25 +51,51 @@ def _prompt_text(sample: Dict[str, Any]) -> str:
     return json.dumps(doc, ensure_ascii=False) if doc else ""
 
 
-def _pred_from_sample(sample: Dict[str, Any]) -> str:
+def _looks_like_generation(raw: Any) -> bool:
+    if not isinstance(raw, str):
+        return False
+    s = raw.strip()
+    if not s:
+        return False
+    if len(s) <= 2:
+        return False
+    # "A. foo" style still MC; long free text is generation
+    head = s[0].upper()
+    if head in {"A", "B", "C", "D", "E"} and s[1] in {".", ")", ":", " "}:
+        return False
+    if s.upper() in {"A", "B", "C", "D", "E"}:
+        return False
+    return len(s.split()) >= 3 or len(s) > 8
+
+
+def _pred_from_sample(sample: Dict[str, Any], *, encoding: str) -> str:
+    raw = None
     if "filtered_resps" in sample and sample["filtered_resps"] is not None:
-        return _as_letter(sample["filtered_resps"])
-    if "resps" in sample and sample["resps"] is not None:
-        return _as_letter(sample["resps"])
-    if sample.get("pred") is not None:
-        return _as_letter(sample["pred"])
-    raise ValueError("lm-eval sample missing filtered_resps/resps/pred")
+        raw = sample["filtered_resps"]
+    elif "resps" in sample and sample["resps"] is not None:
+        raw = sample["resps"]
+    elif sample.get("pred") is not None:
+        raw = sample["pred"]
+    else:
+        raise AnswerEncodingError("lm-eval MC sample missing filtered_resps/resps/pred")
+    if _looks_like_generation(raw if not isinstance(raw, (list, tuple)) else (raw[0] if raw else None)):
+        raise AnswerEncodingError(
+            "lm_eval_samples / lm_eval_mc_samples is MC-only; "
+            "generation-style filtered_resps detected. "
+            "Use a future lm_eval_generation_samples adapter."
+        )
+    return as_mc_letter(raw, encoding=encoding)
 
 
-def _gold_from_sample(sample: Dict[str, Any]) -> str:
+def _gold_from_sample(sample: Dict[str, Any], *, encoding: str) -> str:
     if sample.get("target") is not None:
-        return _as_letter(sample["target"])
+        return as_mc_letter(sample["target"], encoding=encoding)
     doc = sample.get("doc") or {}
     if isinstance(doc, dict):
         for k in ("gold", "label", "answer", "correct_answer"):
             if doc.get(k) is not None:
-                return _as_letter(doc[k])
-    raise ValueError("lm-eval sample missing target/gold")
+                return as_mc_letter(doc[k], encoding=encoding)
+    raise AnswerEncodingError("lm-eval MC sample missing target/gold")
 
 
 def load_lm_eval_samples_blob(path: Path, *, task_name: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -93,11 +103,9 @@ def load_lm_eval_samples_blob(path: Path, *, task_name: Optional[str] = None) ->
     text = path.read_text(encoding="utf-8").strip()
     if not text:
         return []
-    # JSONL if first non-empty line is object and file has multiple lines without wrapping array
     if "\n" in text and not text.lstrip().startswith("["):
         first = text.splitlines()[0].lstrip()
         if first.startswith("{"):
-            # could still be pretty JSON object — detect by trying full parse
             try:
                 obj = json.loads(text)
             except json.JSONDecodeError:
@@ -146,13 +154,14 @@ def sample_to_records(
     model_id: str,
     capability: str,
     sample_index: int,
+    answer_encoding: str,
 ) -> Tuple[SampleRecord, PredictionRecord]:
     doc_id = sample.get("doc_id")
     if doc_id is None:
         doc_id = sample_index
     sample_id = str(sample.get("sample_id") or f"lmeval:{task_name}:{doc_id}")
-    gold = _gold_from_sample(sample)
-    pred = _pred_from_sample(sample)
+    gold = _gold_from_sample(sample, encoding=answer_encoding)
+    pred = _pred_from_sample(sample, encoding=answer_encoding)
     srec = SampleRecord(
         sample_id=sample_id,
         gold={"answer": gold},
@@ -162,11 +171,14 @@ def sample_to_records(
             "benchmark_id": benchmark_id,
             "capability": capability,
             "lm_eval_task": task_name,
+            "adapter_kind": ADAPTER_KIND,
+            "answer_encoding": answer_encoding,
             "doc_id": doc_id,
             "provenance": {
                 "origin": "external_executor",
                 "translation": "unknown",
                 "executor": "lm-eval",
+                "adapter": "lm_eval_mc_samples",
             },
         },
     )
@@ -215,10 +227,16 @@ def load_from_config(
     )
     if not path or not path.is_file():
         raise FileNotFoundError(f"lm-eval samples not found: {path}")
+    encoding = require_answer_encoding(
+        source.get("answer_encoding")
+        if source.get("answer_encoding") is not None
+        else cfg.get("answer_encoding"),
+        where="lm_eval_mc_samples answer_encoding",
+    )
     task_name = str(source.get("task_name") or cfg.get("task_name") or "").strip() or None
     rows = load_lm_eval_samples_blob(path, task_name=task_name)
     language = str(source.get("language") or cfg.get("language") or "und").strip().lower()
-    benchmark_id = str(source.get("benchmark_id") or cfg.get("benchmark_id") or "lm_eval")
+    benchmark_id = str(source.get("benchmark_id") or cfg.get("benchmark_id") or "lm_eval_mc")
     capability = str(source.get("capability") or cfg.get("capability") or "external_benchmark")
     model_id = str(source.get("model_id") or cfg.get("model_id") or "lm_eval")
     resolved_task = task_name or "default"
@@ -233,6 +251,7 @@ def load_from_config(
             model_id=model_id,
             capability=capability,
             sample_index=i,
+            answer_encoding=encoding,
         )
         samples.append(s)
         preds.append(p)

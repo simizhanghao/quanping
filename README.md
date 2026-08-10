@@ -51,8 +51,9 @@ PYTHONPATH=src python -m pytest -q
 | P3-A LanguagePack registry / inspect (`language-inspect-offline`) | Supported |
 | P3-B Belebele-format matrix (`language-matrix-offline`) | Supported |
 | P3-C Native Indonesian capabilities (IndoMMLU/COPAL-format) | Supported |
-| P3-D lm-eval `--log_samples` adapter (`lm_eval_samples`) | Supported |
+| P3-D lm-eval MC `--log_samples` adapter (`lm_eval_mc_samples`) | Supported (MC-only) |
 | P3-E Language × capability regression report + gates | Supported |
+| P3-F Real-data & regression hardening | Supported (F-A/B/C code; F-D pack+runner — run for real numbers) |
 
 **Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `toy_consistency_intent`, `toy_context_intent`, `toy_language_pack`, `toy_belebele`, `toy_indommlu`, `toy_copal_id`, `toy_lm_eval`, `indonesian_n2s` (reference).
 
@@ -60,11 +61,14 @@ PYTHONPATH=src python -m pytest -q
 
 | Capability | Phase |
 |------------|-------|
-| Full Belebele / IndoMMLU / COPAL downloads | later data packs |
+| P3-F-A～D: generic `primary_metric` + P1 paired CI + encoding + real Base/SFT matrix | P3-F |
+| Full Belebele / IndoMMLU / COPAL downloads | via `scripts/prepare_language_real_subset.py --from-hf` |
 | Colloquial / real ASR packs | later |
 | Online conversation prompt assembly | later |
-| Production profiling + rich release cards | P4 |
-| Online model inference in-core | later adapters |
+| P4-A OpenAI-compatible online ModelAdapter | P4 |
+| P4-B Production profiler (TTFT/TPOT/E2E/goodput) | P4 |
+| P4-C SafetyPack (no Safety Score) | P4 |
+| P4-D Unified Release Card / Gate | P4 |
 | HTML dashboard / auto slice discovery | non-goals for now |
 
 ## Docs

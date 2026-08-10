@@ -1,12 +1,13 @@
 run_id: score_lm_eval_samples_toy
 packs: [business, language]
 source:
-  adapter: lm_eval_samples
+  adapter: lm_eval_mc_samples
   task_name: toy_mc_ind
   language: ind
   benchmark_id: toy_lm_eval_mc
   capability: local_knowledge
   model_id: toy_lm_eval_model
+  answer_encoding: zero_based_index
   samples: ../../examples/toy_lm_eval/samples_toy_mc_ind.json
 task_spec: ../../examples/toy_lm_eval/task.yaml
 output_spec: ../../examples/toy_lm_eval/output.yaml

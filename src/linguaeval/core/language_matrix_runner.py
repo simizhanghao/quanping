@@ -1,6 +1,7 @@
-"""Multi-language / multi-capability score + Base↔SFT matrix (P3-B/C).
+"""Multi-language / multi-capability score + Base↔SFT matrix (P3-B/C/F).
 
-Reuses TaskScorer / MetricSpec / ScoreRecord — does not invent a second score world.
+Reuses TaskScorer / MetricSpec / ScoreRecord and P1 paired compare kernel —
+does not invent a second score or regression world.
 """
 
 from __future__ import annotations
@@ -12,10 +13,19 @@ from uuid import uuid4
 import yaml
 
 from linguaeval.adapters.dataset.registry import get_adapter
+from linguaeval.compare.alignment import AlignmentError
 from linguaeval.compare.gates import evaluate_gates
+from linguaeval.compare.paired import compute_paired_comparison
 from linguaeval.core.fingerprint import build_provenance
 from linguaeval.core.manifest import write_json, write_manifest
-from linguaeval.core.schema import MetricSpec, OutputSpec, RunManifest, TaskSpec
+from linguaeval.core.schema import (
+    MetricSpec,
+    OutputSpec,
+    PredictionRecord,
+    RunManifest,
+    SampleRecord,
+    TaskSpec,
+)
 from linguaeval.metrics.aggregate import build_business_metrics
 from linguaeval.metrics.classification import score_targets
 from linguaeval.metrics.score_records import build_score_records
@@ -43,10 +53,51 @@ def _resolve_out_dir(config_path: Path, out_dir_raw: str) -> Path:
     return config_path.parent / out_dir_raw
 
 
-def _primary_accuracy(business: Dict[str, Any], target: str) -> Optional[float]:
-    block = ((business.get("targets") or {}).get(target) or {})
-    v = block.get("accuracy")
-    return float(v) if isinstance(v, (int, float)) else None
+def _primary_metric_fields(
+    business: Dict[str, Any],
+    *,
+    report_cfg: Dict[str, Any],
+    task: TaskSpec,
+) -> Dict[str, Any]:
+    """Resolve compare metric from report config — never hardcode accuracy."""
+    target = str(report_cfg.get("primary_target") or task.targets[0].name)
+    metric = str(report_cfg.get("primary_metric") or "accuracy")
+    metric_path = f"targets.{target}.{metric}"
+    primary = business.get("primary") or {}
+    value: Optional[float] = None
+    if primary.get("target") == target and primary.get("metric") == metric:
+        raw = primary.get("value")
+        if isinstance(raw, (int, float)):
+            value = float(raw)
+    if value is None:
+        raw = ((business.get("targets") or {}).get(target) or {}).get(metric)
+        if isinstance(raw, (int, float)):
+            value = float(raw)
+    return {
+        "primary_target": target,
+        "primary_metric": metric,
+        "metric_path": metric_path,
+        "value": value,
+    }
+
+
+def _load_side(
+    *,
+    source: Dict[str, Any],
+    config_path: Path,
+    cfg: Dict[str, Any],
+    output_spec: OutputSpec,
+    parse_mode: str,
+    default_adapter: str,
+) -> Tuple[List[SampleRecord], List[PredictionRecord], Any]:
+    adapter_name = source.get("adapter") or default_adapter
+    adapter = get_adapter(str(adapter_name))
+    samples, preds = adapter(source, config_path.parent, cfg)
+    preds = apply_output_spec(preds, output_spec, mode=parse_mode)
+    prov = None
+    if samples and isinstance(samples[0].meta, dict):
+        prov = samples[0].meta.get("provenance")
+    return samples, preds, prov
 
 
 def _score_side(
@@ -60,35 +111,108 @@ def _score_side(
     parse_mode: str,
     default_adapter: str,
 ) -> Dict[str, Any]:
-    adapter_name = source.get("adapter") or default_adapter
-    adapter = get_adapter(str(adapter_name))
-    samples, preds = adapter(source, config_path.parent, cfg)
-    preds = apply_output_spec(preds, output_spec, mode=parse_mode)
-    prov = None
-    if samples and isinstance(samples[0].meta, dict):
-        prov = samples[0].meta.get("provenance")
+    samples, preds, prov = _load_side(
+        source=source,
+        config_path=config_path,
+        cfg=cfg,
+        output_spec=output_spec,
+        parse_mode=parse_mode,
+        default_adapter=default_adapter,
+    )
+    report_cfg = dict(cfg.get("report") or {})
     if not preds:
+        fields = _primary_metric_fields({}, report_cfg=report_cfg, task=task)
         return {
             "status": "NOT_AVAILABLE",
             "reason": "missing_predictions",
             "n_samples": len(samples),
             "provenance": prov,
+            **fields,
         }
     scored = score_targets(samples, preds, task, metric_spec)
-    business = build_business_metrics(scored, report_cfg=cfg.get("report") or {})
+    business = build_business_metrics(scored, report_cfg=report_cfg)
     score_rows = build_score_records(samples, preds, task)
-    target = str((cfg.get("report") or {}).get("primary_target") or task.targets[0].name)
+    fields = _primary_metric_fields(business, report_cfg=report_cfg, task=task)
     return {
         "status": "AVAILABLE",
         "n_samples": len(samples),
         "n_predictions": len(preds),
         "n_score_records": len(score_rows),
-        "accuracy": _primary_accuracy(business, target),
         "business": business,
-        "target": target,
         "language": source.get("language"),
         "benchmark_id": source.get("benchmark_id"),
         "provenance": prov,
+        **fields,
+    }
+
+
+def _paired_regression(
+    *,
+    samples: List[SampleRecord],
+    preds_b: List[PredictionRecord],
+    preds_c: List[PredictionRecord],
+    task: TaskSpec,
+    metric_spec: MetricSpec,
+    cfg: Dict[str, Any],
+    benchmark_id: Any,
+) -> Dict[str, Any]:
+    report_cfg = dict(cfg.get("report") or {})
+    stats_cfg = dict(cfg.get("statistics") or {})
+    compare_cfg = dict(cfg.get("compare") or {})
+    target = str(
+        compare_cfg.get("target")
+        or report_cfg.get("primary_target")
+        or task.targets[0].name
+    )
+    denominator = str(compare_cfg.get("denominator") or "semantic")
+    paired = compute_paired_comparison(
+        samples,
+        preds_b,
+        preds_c,
+        task=task,
+        metric_spec=metric_spec,
+        target=target,
+        denominator=denominator,
+        report_cfg=report_cfg,
+        stats_cfg=stats_cfg,
+    )
+    support = dict(paired.get("support") or {})
+    side_keys = ("status", "n_samples", "value", "benchmark_id", "metric_path", "primary_metric")
+    b_view = {
+        "status": "AVAILABLE",
+        "n_samples": support.get("n_aligned"),
+        "value": paired.get("baseline_value"),
+        "benchmark_id": benchmark_id,
+        "metric_path": paired.get("metric_path"),
+        "primary_metric": paired.get("primary_metric"),
+    }
+    c_view = {
+        "status": "AVAILABLE",
+        "n_samples": support.get("n_aligned"),
+        "value": paired.get("candidate_value"),
+        "benchmark_id": benchmark_id,
+        "metric_path": paired.get("metric_path"),
+        "primary_metric": paired.get("primary_metric"),
+    }
+    alignment = paired.get("alignment")
+    return {
+        "status": "AVAILABLE",
+        "engine": "p1_paired_compare",
+        "primary_target": paired.get("primary_target"),
+        "primary_metric": paired.get("primary_metric"),
+        "metric_path": paired.get("metric_path"),
+        "baseline_value": paired.get("baseline_value"),
+        "candidate_value": paired.get("candidate_value"),
+        "delta": paired.get("delta"),
+        "delta_ci_low": paired.get("delta_ci_low"),
+        "delta_ci_high": paired.get("delta_ci_high"),
+        "transitions": paired.get("transitions"),
+        "statistics": paired.get("statistics"),
+        "metric_deltas": paired.get("metric_deltas"),
+        "alignment": alignment.to_dict() if hasattr(alignment, "to_dict") else alignment,
+        "support": support,
+        "baseline": {k: b_view[k] for k in side_keys},
+        "candidate": {k: c_view[k] for k in side_keys},
     }
 
 
@@ -119,6 +243,10 @@ def _eval_languages(
             or cfg.get("benchmark_id")
             or f"{default_benchmark_prefix}_{lang}",
         )
+        if block.get("answer_encoding") is not None:
+            shared.setdefault("answer_encoding", block.get("answer_encoding"))
+        elif cfg.get("answer_encoding") is not None:
+            shared.setdefault("answer_encoding", cfg.get("answer_encoding"))
         single_src = dict(shared)
         if block.get("predictions"):
             single_src["predictions"] = block["predictions"]
@@ -150,42 +278,57 @@ def _eval_languages(
             c_src.setdefault("language", lang)
             b_src.setdefault("samples", single_src.get("samples"))
             c_src.setdefault("samples", single_src.get("samples"))
-            b_res = _score_side(
+            samples_b, preds_b, prov_b = _load_side(
                 source=b_src,
                 config_path=config_path,
                 cfg=cfg,
-                task=task,
                 output_spec=output_spec,
-                metric_spec=metric_spec,
                 parse_mode=parse_mode,
                 default_adapter=default_adapter,
             )
-            c_res = _score_side(
+            _samples_c, preds_c, prov_c = _load_side(
                 source=c_src,
                 config_path=config_path,
                 cfg=cfg,
-                task=task,
                 output_spec=output_spec,
-                metric_spec=metric_spec,
                 parse_mode=parse_mode,
                 default_adapter=default_adapter,
             )
-            b_acc, c_acc = b_res.get("accuracy"), c_res.get("accuracy")
-            delta = (
-                float(c_acc) - float(b_acc)
-                if isinstance(b_acc, (int, float)) and isinstance(c_acc, (int, float))
-                else None
-            )
-            reg_block = {
-                "status": "AVAILABLE",
-                "baseline_accuracy": b_acc,
-                "candidate_accuracy": c_acc,
-                "delta_accuracy": delta,
-                "baseline": {k: b_res[k] for k in ("status", "n_samples", "accuracy", "benchmark_id")},
-                "candidate": {k: c_res[k] for k in ("status", "n_samples", "accuracy", "benchmark_id")},
-            }
-            if single is None:
-                single = c_res
+            if not preds_b or not preds_c:
+                reg_block = {
+                    "status": "NOT_AVAILABLE",
+                    "reason": "missing_predictions",
+                    "n_baseline": len(preds_b),
+                    "n_candidate": len(preds_c),
+                }
+            else:
+                try:
+                    reg_block = _paired_regression(
+                        samples=samples_b,
+                        preds_b=preds_b,
+                        preds_c=preds_c,
+                        task=task,
+                        metric_spec=metric_spec,
+                        cfg=cfg,
+                        benchmark_id=shared.get("benchmark_id"),
+                    )
+                except AlignmentError as e:
+                    reg_block = {
+                        "status": "ERROR",
+                        "reason": "alignment_error",
+                        "detail": str(e),
+                    }
+                if single is None and reg_block.get("status") == "AVAILABLE":
+                    single = {
+                        "status": "AVAILABLE",
+                        "n_samples": (reg_block.get("support") or {}).get("n_aligned"),
+                        "value": reg_block.get("candidate_value"),
+                        "metric_path": reg_block.get("metric_path"),
+                        "primary_metric": reg_block.get("primary_metric"),
+                        "primary_target": reg_block.get("primary_target"),
+                        "benchmark_id": shared.get("benchmark_id"),
+                        "provenance": prov_c or prov_b,
+                    }
 
         prov = (single or {}).get("provenance") or {
             "origin": "unknown",
@@ -195,11 +338,21 @@ def _eval_languages(
             "capability": capability,
             "benchmark_id": shared.get("benchmark_id"),
             "status": (single or {}).get("status") or "NOT_AVAILABLE",
-            "accuracy": (single or {}).get("accuracy"),
-            "n_samples": (single or {}).get("n_samples"),
+            "value": (single or {}).get("value"),
+            "metric_path": (single or {}).get("metric_path") or reg_block.get("metric_path"),
+            "primary_metric": (single or {}).get("primary_metric") or reg_block.get("primary_metric"),
+            "primary_target": (single or {}).get("primary_target") or reg_block.get("primary_target"),
+            "n_samples": (single or {}).get("n_samples")
+            or (reg_block.get("support") or {}).get("n_aligned"),
             "provenance": prov,
             "native_authored": bool((prov or {}).get("native_authored")),
         }
+        if single is None and reg_block.get("status") == "AVAILABLE":
+            metrics_by_lang[lang]["value"] = reg_block.get("candidate_value")
+            metrics_by_lang[lang]["status"] = "AVAILABLE"
+            metrics_by_lang[lang]["n_samples"] = (reg_block.get("support") or {}).get(
+                "n_aligned"
+            )
         reg_by_lang[lang] = reg_block
     return metrics_by_lang, reg_by_lang
 
@@ -271,6 +424,7 @@ def run_offline_language_matrix(config_path: Path) -> Path:
     }
     language_regression: Dict[str, Any] = {
         "status": "AVAILABLE",
+        "engine": "p1_paired_compare",
         "by_capability": by_capability_reg,
     }
     if flat_cap:
@@ -279,37 +433,59 @@ def run_offline_language_matrix(config_path: Path) -> Path:
         language_regression["capability"] = flat_cap
         language_regression["by_language"] = by_capability_reg[flat_cap]["by_language"]
 
-    # P3-E: flat capability × language rows (no multilingual total score)
+    # P3-E/F: flat capability × language rows (no multilingual total score)
     report_rows: List[Dict[str, Any]] = []
+    n_aligned_vals: List[int] = []
     for cap, block in by_capability_reg.items():
         for lang, row in (block.get("by_language") or {}).items():
             mrow = (by_capability_metrics.get(cap) or {}).get("by_language", {}).get(lang) or {}
+            support = dict(row.get("support") or {})
+            n_al = support.get("n_aligned") or mrow.get("n_samples")
+            if isinstance(n_al, int):
+                n_aligned_vals.append(n_al)
             report_rows.append(
                 {
                     "language": lang,
                     "capability": cap,
                     "benchmark_id": mrow.get("benchmark_id"),
                     "native_authored": mrow.get("native_authored"),
-                    "baseline_accuracy": row.get("baseline_accuracy"),
-                    "candidate_accuracy": row.get("candidate_accuracy"),
-                    "delta_accuracy": row.get("delta_accuracy"),
+                    "metric_path": row.get("metric_path") or mrow.get("metric_path"),
+                    "primary_metric": row.get("primary_metric") or mrow.get("primary_metric"),
+                    "baseline_value": row.get("baseline_value"),
+                    "candidate_value": row.get("candidate_value"),
+                    "delta": row.get("delta"),
+                    "delta_ci_low": row.get("delta_ci_low"),
+                    "delta_ci_high": row.get("delta_ci_high"),
+                    "transitions": row.get("transitions"),
                     "status": row.get("status"),
-                    "n_samples": mrow.get("n_samples"),
+                    "n_samples": mrow.get("n_samples") or n_al,
                 }
             )
 
+    report_cfg = dict(cfg.get("report") or {})
     capability_report: Dict[str, Any] = {
         "status": "AVAILABLE",
         "task": task.name,
+        "primary_target": report_cfg.get("primary_target"),
+        "primary_metric": report_cfg.get("primary_metric"),
+        "engine": "p1_paired_compare",
         "rows": report_rows,
         "note": "No multilingual total score — compare by language × capability only.",
     }
 
+    # Conservative support for CI gates: min aligned n across cells
+    support_n = min(n_aligned_vals) if n_aligned_vals else sum(
+        int(r.get("n_samples") or 0) for r in report_rows
+    )
     gate_context = {
         "language_metrics": language_metrics,
         "language_regression": language_regression,
         "capability_report": capability_report,
-        "support": {"n_samples": sum(int(r.get("n_samples") or 0) for r in report_rows)},
+        "support": {
+            "n_samples": support_n,
+            "n_units": support_n,
+            "n_aligned": support_n,
+        },
     }
     gate_specs = list(cfg.get("gates") or [])
     gates = evaluate_gates(gate_context, gate_specs) if gate_specs else {
@@ -327,22 +503,27 @@ def run_offline_language_matrix(config_path: Path) -> Path:
     write_json(out_dir / "gate.json", gates)
 
     lines = [
-        "# LinguaEval Language Capability Report (P3-E)",
+        "# LinguaEval Language Capability Report (P3-E/F)",
         "",
         f"- task: `{task.name}`",
         f"- capabilities: `{list(by_capability_metrics)}`",
+        f"- engine: `p1_paired_compare`",
         f"- gates: `{gates.get('status')}`",
         "",
-        "## Matrix (candidate − baseline)",
+        "## Matrix (candidate − baseline, paired)",
         "",
-        "| Language | Capability | Base | Candidate | Δ | Native |",
-        "|----------|------------|-----:|----------:|--:|:------:|",
+        f"- primary_metric: `{report_cfg.get('primary_metric')}`",
+        "",
+        "| Language | Capability | Metric | Base | Candidate | Δ | Δ CI95 | Native |",
+        "|----------|------------|--------|-----:|----------:|--:|:------:|:------:|",
     ]
     for r in report_rows:
+        ci = f"[{r.get('delta_ci_low')}, {r.get('delta_ci_high')}]"
         lines.append(
             f"| `{r.get('language')}` | `{r.get('capability')}` | "
-            f"{r.get('baseline_accuracy')} | {r.get('candidate_accuracy')} | "
-            f"{r.get('delta_accuracy')} | {r.get('native_authored')} |"
+            f"`{r.get('metric_path')}` | {r.get('baseline_value')} | "
+            f"{r.get('candidate_value')} | {r.get('delta')} | {ci} | "
+            f"{r.get('native_authored')} |"
         )
     lines += ["", "## Gate details", ""]
     for g in gates.get("gates") or []:
@@ -374,6 +555,7 @@ def run_offline_language_matrix(config_path: Path) -> Path:
             provenance=provenance,
             notes={
                 "mode": "offline_language_matrix",
+                "engine": "p1_paired_compare",
                 "capabilities": list(by_capability_metrics),
                 "gate_status": gates.get("status"),
             },

@@ -10,22 +10,18 @@ import yaml
 
 from linguaeval.adapters.dataset.registry import get_adapter
 from linguaeval.compare.aggregate import (
-    metric_deltas,
-    summarize_transitions,
     write_comparison_jsonl,
     write_transition_cases,
 )
-from linguaeval.compare.alignment import AlignmentError, index_by_id, require_strict_alignment
-from linguaeval.compare.bootstrap import build_pair_rows, run_paired_bootstrap
+from linguaeval.compare.alignment import AlignmentError
 from linguaeval.compare.gates import evaluate_gates
+from linguaeval.compare.paired import compute_paired_comparison
 from linguaeval.compare.protocol import (
-    ComparisonProtocolError,
     evaluate_comparability,
     validate_comparison_protocol,
 )
 from linguaeval.compare.report import write_compare_report_md
 from linguaeval.compare.slices import build_slice_comparison
-from linguaeval.compare.transitions import build_comparison_records
 from linguaeval.core.fingerprint import build_provenance, fingerprint_records, sha256_file
 from linguaeval.core.manifest import write_json, write_manifest
 from linguaeval.core.schema import (
@@ -36,9 +32,6 @@ from linguaeval.core.schema import (
     SampleRecord,
     TaskSpec,
 )
-from linguaeval.metrics.aggregate import build_business_metrics
-from linguaeval.metrics.classification import score_targets
-from linguaeval.metrics.score_records import build_score_records
 from linguaeval.parse.pipeline import apply_output_spec
 
 
@@ -135,51 +128,39 @@ def run_offline_compare(config_path: Path) -> Path:
     preds_b = apply_output_spec(preds_b, output_spec, mode=parse_mode)
     preds_c = apply_output_spec(preds_c, output_spec, mode=parse_mode)
 
-    try:
-        align_audit = require_strict_alignment(preds_b, preds_c)
-    except AlignmentError:
-        # still write a minimal audit dir if output_dir known — re-raise after
-        raise
-
-    # Gold sample ids must cover prediction ids
-    sample_ids = {s.sample_id for s in samples}
-    pred_ids = {p.sample_id for p in preds_b}
-    missing_gold = sorted(pred_ids - sample_ids)
-    if missing_gold:
-        raise AlignmentError(
-            f"samples missing gold for sample_id={missing_gold[0]} "
-            f"(count={len(missing_gold)})"
-        )
-
-    # Keep samples ordered by baseline prediction order
-    sample_map = index_by_id(samples)
-    ordered_ids = [p.sample_id for p in preds_b]
-    samples_aligned = [sample_map[i] for i in ordered_ids]
-    preds_b_map = index_by_id(preds_b)
-    preds_c_map = index_by_id(preds_c)
-    preds_b_ord = [preds_b_map[i] for i in ordered_ids]
-    preds_c_ord = [preds_c_map[i] for i in ordered_ids]
-
-    scores_b = build_score_records(samples_aligned, preds_b_ord, task)
-    scores_c = build_score_records(samples_aligned, preds_c_ord, task)
-    records, tcounts = build_comparison_records(
-        scores_b,
-        scores_c,
-        target=str(target),
-        denominator=denominator,
-        ordered_ids=ordered_ids,
-    )
-
-    scored_b = score_targets(samples_aligned, preds_b_ord, task, metric_spec)
-    scored_c = score_targets(samples_aligned, preds_c_ord, task, metric_spec)
-    report_cfg = cfg.get("report") or {}
-    biz_b = build_business_metrics(scored_b, report_cfg=report_cfg)
-    biz_c = build_business_metrics(scored_c, report_cfg=report_cfg)
-    deltas = metric_deltas(biz_b, biz_c, target=str(target))
-
-    target_spec = next(t for t in task.targets if t.name == target)
+    report_cfg = dict(cfg.get("report") or {})
     stats_cfg = dict(cfg.get("statistics") or {})
     slices_cfg = dict(cfg.get("slices") or {})
+
+    try:
+        paired = compute_paired_comparison(
+            samples,
+            preds_b,
+            preds_c,
+            task=task,
+            metric_spec=metric_spec,
+            target=str(target),
+            denominator=denominator,
+            report_cfg=report_cfg,
+            stats_cfg=stats_cfg,
+        )
+    except AlignmentError:
+        raise
+
+    samples_aligned = paired["samples_aligned"]
+    preds_b_ord = paired["preds_baseline"]
+    preds_c_ord = paired["preds_candidate"]
+    scores_b = paired["scores_baseline"]
+    scores_c = paired["scores_candidate"]
+    records = paired["records"]
+    pair_rows = paired["pair_rows"]
+    ordered_ids = [p.sample_id for p in preds_b_ord]
+    align_audit = paired["alignment"]
+    statistics = paired["statistics"]
+    biz_b_full = paired["baseline_business"]
+    biz_c_full = paired["candidate_business"]
+
+    target_spec = next(t for t in task.targets if t.name == target)
     bootstrap_unit = str(stats_cfg.get("bootstrap_unit") or "sample")
     metric_names = list(
         stats_cfg.get("metrics")
@@ -202,35 +183,6 @@ def run_offline_compare(config_path: Path) -> Path:
     ]
     if not metric_names and report_cfg.get("primary_metric"):
         metric_names = [str(report_cfg["primary_metric"])]
-
-    pair_rows = build_pair_rows(
-        samples_aligned,
-        scores_b,
-        scores_c,
-        records,
-        target=str(target),
-        bootstrap_unit=bootstrap_unit,
-        denominator=denominator,
-    )
-
-    statistics: Optional[Dict[str, Any]] = None
-    if bool(stats_cfg.get("enabled", False)):
-        statistics = {
-            "enabled": True,
-            "bootstrap_unit": bootstrap_unit,
-            **run_paired_bootstrap(
-                pair_rows,
-                target_type=target_spec.type,
-                metric_names=metric_names,
-                n_bootstrap=int(stats_cfg.get("n_bootstrap") or 1000),
-                confidence_level=float(
-                    stats_cfg.get("confidence_level") or stats_cfg.get("ci") or 0.95
-                ),
-                seed=int(stats_cfg.get("seed") or 42),
-                labels=target_spec.labels,
-                round_digits=metric_spec.round_digits,
-            ),
-        }
 
     slice_comparison: Optional[Dict[str, Any]] = None
     if bool(slices_cfg.get("enabled", False)):
@@ -255,20 +207,12 @@ def run_offline_compare(config_path: Path) -> Path:
             "display": compare_cfg.get("display")
             or {"baseline": "baseline", "candidate": "candidate"},
         },
-        "transitions": summarize_transitions(tcounts),
-        "metric_deltas": deltas,
+        "transitions": paired["transitions"],
+        "metric_deltas": paired["metric_deltas"],
         "statistics": statistics,
         "slices": slice_comparison,
-        "baseline_business": {
-            "primary": biz_b.get("primary"),
-            "targets": {str(target): (biz_b.get("targets") or {}).get(target)},
-            "schema": biz_b.get("schema"),
-        },
-        "candidate_business": {
-            "primary": biz_c.get("primary"),
-            "targets": {str(target): (biz_c.get("targets") or {}).get(target)},
-            "schema": biz_c.get("schema"),
-        },
+        "baseline_business": paired["baseline_business_view"],
+        "candidate_business": paired["candidate_business_view"],
     }
 
     baseline_pred_path = _resolve(
@@ -371,7 +315,7 @@ def run_offline_compare(config_path: Path) -> Path:
         audit_path,
         {
             **align_audit.to_dict(),
-            "transitions": summarize_transitions(tcounts),
+            "transitions": paired["transitions"],
             "denominator": denominator,
             "target": target,
         },
@@ -411,6 +355,6 @@ def run_offline_compare(config_path: Path) -> Path:
     manifest.notes["gate_status"] = (gate_result or {}).get("status")
     write_manifest(out_dir / "manifest.json", manifest)
     # keep side business dumps for debugging
-    write_json(out_dir / "baseline_business_metrics.json", biz_b)
-    write_json(out_dir / "candidate_business_metrics.json", biz_c)
+    write_json(out_dir / "baseline_business_metrics.json", biz_b_full)
+    write_json(out_dir / "candidate_business_metrics.json", biz_c_full)
     return out_dir

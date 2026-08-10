@@ -8,6 +8,16 @@ parse:
 report:
   primary_target: answer
   primary_metric: accuracy
+compare:
+  target: answer
+  denominator: semantic
+statistics:
+  enabled: true
+  n_bootstrap: 100
+  confidence_level: 0.95
+  seed: 42
+  bootstrap_unit: sample
+  metrics: [accuracy]
 capabilities:
   reading_comprehension:
     adapter: belebele_jsonl
@@ -25,6 +35,7 @@ capabilities:
       ind:
         samples: ../../examples/toy_indommlu/samples.jsonl
         benchmark_id: toy_indommlu
+        answer_encoding: letter
         baseline:
           predictions: ../../examples/toy_indommlu/predictions_base.jsonl
         candidate:
@@ -35,6 +46,7 @@ capabilities:
       ind:
         samples: ../../examples/toy_copal_id/samples.jsonl
         benchmark_id: toy_copal_id
+        answer_encoding: zero_based_index
         baseline:
           predictions: ../../examples/toy_copal_id/predictions_base.jsonl
         candidate:

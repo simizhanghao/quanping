@@ -31,8 +31,10 @@ def test_indommlu_native_provenance():
         language="ind",
         benchmark_id="toy",
         capability="local_knowledge",
+        answer_encoding="letter",
     )
     assert s.gold["answer"] == "B"
+    assert s.meta["answer_encoding"] == "letter"
     assert s.meta["provenance"]["native_authored"] is True
     assert s.meta["provenance"]["translation"] == "native"
 
@@ -43,8 +45,10 @@ def test_copal_binary():
         language="ind",
         benchmark_id="toy",
         capability="cultural_reasoning",
+        answer_encoding="zero_based_index",
     )
     assert s.gold["answer"] == "B"
+    assert s.meta["answer_encoding"] == "zero_based_index"
     assert s.meta["provenance"]["culture_sensitive"] is True
 
 
@@ -63,15 +67,13 @@ def test_capability_matrix_three_pillars():
     assert reading["native_authored"] is False  # parallel belebele
     assert knowledge["native_authored"] is True
     assert culture["native_authored"] is True
-    assert knowledge["accuracy"] == pytest.approx(1.0)
-    assert culture["accuracy"] == pytest.approx(1.0)
+    assert knowledge["value"] == pytest.approx(1.0)
+    assert culture["value"] == pytest.approx(1.0)
 
-    assert r["by_capability"]["local_knowledge"]["by_language"]["ind"]["delta_accuracy"] == pytest.approx(
-        0.5
+    assert r["by_capability"]["local_knowledge"]["by_language"]["ind"]["delta"] == pytest.approx(0.5)
+    assert r["by_capability"]["cultural_reasoning"]["by_language"]["ind"]["delta"] == pytest.approx(
+        0.25
     )
-    assert r["by_capability"]["cultural_reasoning"]["by_language"]["ind"][
-        "delta_accuracy"
-    ] == pytest.approx(0.25)
-    assert r["by_capability"]["reading_comprehension"]["by_language"]["ind"][
-        "delta_accuracy"
-    ] == pytest.approx(0.25)
+    assert r["by_capability"]["reading_comprehension"]["by_language"]["ind"]["delta"] == pytest.approx(
+        0.25
+    )

@@ -70,18 +70,21 @@ def test_language_matrix_ind_gain_arb_regression():
     reg = json.loads((out / "language_regression.json").read_text(encoding="utf-8"))
     assert metrics["capability"] == "reading_comprehension"
     assert set(metrics["by_language"]) == {"ind", "arb"}
-    # candidate accuracies used in metrics when baseline/candidate present
-    assert metrics["by_language"]["ind"]["accuracy"] == pytest.approx(1.0)
-    assert metrics["by_language"]["arb"]["accuracy"] == pytest.approx(0.5)
+    # candidate primary metric values when baseline/candidate present
+    assert metrics["by_language"]["ind"]["value"] == pytest.approx(1.0)
+    assert metrics["by_language"]["arb"]["value"] == pytest.approx(0.5)
+    assert metrics["by_language"]["ind"]["metric_path"] == "targets.answer.accuracy"
 
     ind = reg["by_language"]["ind"]
     arb = reg["by_language"]["arb"]
-    assert ind["baseline_accuracy"] == pytest.approx(0.75)
-    assert ind["candidate_accuracy"] == pytest.approx(1.0)
-    assert ind["delta_accuracy"] == pytest.approx(0.25)
-    assert arb["baseline_accuracy"] == pytest.approx(0.625)
-    assert arb["candidate_accuracy"] == pytest.approx(0.5)
-    assert arb["delta_accuracy"] == pytest.approx(-0.125)
+    assert ind["metric_path"] == "targets.answer.accuracy"
+    assert ind["baseline_value"] == pytest.approx(0.75)
+    assert ind["candidate_value"] == pytest.approx(1.0)
+    assert ind["delta"] == pytest.approx(0.25)
+    assert arb["baseline_value"] == pytest.approx(0.625)
+    assert arb["candidate_value"] == pytest.approx(0.5)
+    assert arb["delta"] == pytest.approx(-0.125)
+    assert "delta_accuracy" not in ind
 
     # adapter used (no n2s)
     adapter = get_adapter("belebele_jsonl")
