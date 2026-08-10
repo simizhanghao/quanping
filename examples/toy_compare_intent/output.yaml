@@ -1,0 +1,6 @@
+format: text
+parser: identity
+schema:
+  required: [intent_class]
+constraints:
+  no_markdown: true

@@ -1,0 +1,28 @@
+run_id: compare_base_sft_toy_intent
+packs: [compare, business]
+samples: ../../examples/toy_compare_intent/samples.jsonl
+baseline:
+  source:
+    adapter: jsonl
+    samples: ../../examples/toy_compare_intent/samples.jsonl
+    predictions: ../../examples/toy_compare_intent/baseline_predictions.jsonl
+candidate:
+  source:
+    adapter: jsonl
+    samples: ../../examples/toy_compare_intent/samples.jsonl
+    predictions: ../../examples/toy_compare_intent/candidate_predictions.jsonl
+task_spec: ../../examples/toy_compare_intent/task.yaml
+output_spec: ../../examples/toy_compare_intent/output.yaml
+metric_spec: ../../examples/toy_compare_intent/metrics.yaml
+parse:
+  mode: from_parsed
+compare:
+  target: intent_class
+  denominator: semantic
+  display:
+    baseline: Base
+    candidate: SFT
+report:
+  primary_target: intent_class
+  primary_metric: accuracy
+output_dir: results/05_compare_base_sft_toy

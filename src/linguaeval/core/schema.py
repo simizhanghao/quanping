@@ -238,6 +238,41 @@ class ScoreRecord:
 
 
 @dataclass
+class SideScore:
+    """One side of a paired comparison (baseline or candidate)."""
+
+    pred: Any = None
+    correct: Optional[bool] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"pred": self.pred, "correct": self.correct}
+
+
+@dataclass
+class ComparisonRecord:
+    """Sample-level paired regression record (generic; no business field names)."""
+
+    sample_id: str
+    target: str
+    applicable: bool
+    baseline: SideScore = field(default_factory=SideScore)
+    candidate: SideScore = field(default_factory=SideScore)
+    transition: Optional[str] = None  # stable_correct|gain|regression|both_wrong
+    exclusion: Optional[str] = None  # not_applicable|excluded_format|None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "sample_id": self.sample_id,
+            "target": self.target,
+            "applicable": self.applicable,
+            "baseline": self.baseline.to_dict(),
+            "candidate": self.candidate.to_dict(),
+            "transition": self.transition,
+            "exclusion": self.exclusion,
+        }
+
+
+@dataclass
 class RunManifest:
     run_id: str
     created_at: str = field(default_factory=_utc_now_iso)

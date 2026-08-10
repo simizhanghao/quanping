@@ -1,0 +1,28 @@
+run_id: compare_base_sft_n2s_qwen3_4b
+packs: [compare, business, schema]
+baseline:
+  source:
+    adapter: n2s_dialogue_prediction
+    model_id: qwen3_4b_base
+    # Must be the same eval set as SFT (3471). qwen3_4b_base_test3.json is a partial run — strict align rejects it.
+    path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/content_Indonesian_multi_skill_qwen3_4b_base_en.json
+candidate:
+  source:
+    adapter: n2s_dialogue_prediction
+    model_id: qwen3_4b_sft
+    path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/qwen3_4b_test3.json
+task_spec: ../../examples/indonesian_n2s/task.yaml
+output_spec: ../../examples/indonesian_n2s/output.yaml
+metric_spec: ../../examples/indonesian_n2s/metrics.yaml
+parse:
+  mode: from_parsed
+compare:
+  target: n2s
+  denominator: semantic
+  display:
+    baseline: Base
+    candidate: SFT
+report:
+  primary_target: n2s
+  primary_metric: f1
+output_dir: results/06_compare_base_sft_n2s

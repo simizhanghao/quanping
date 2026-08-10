@@ -236,7 +236,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 01_project_structure.md       # 本文
 │   ├── 02_core_contracts.md          # 字段级冻结
 │   ├── 03_metric_denominators.md     # coverage / semantic / strict
-│   └── 04_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 04_paired_regression_p1a.md   # baseline/candidate compare (P1-A)
+│   └── 05_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -360,14 +361,22 @@ LlamaFactory/tests/yewupingce/n2s_test/
 
 **不做（P0.5）：** IndoMMLU、Calibration、Bootstrap、在线推理。
 
-### P1 — Business + Schema + Regression + basic telemetry
+### P1 — Paired Regression + Statistics（D3）
+
+| Slice | Goal |
+|-------|------|
+| **A** | `baseline`/`candidate` align + ComparisonRecord + 4-cell + mini metric Δ + cases（见 `docs/04_paired_regression_p1a.md`） |
+| **B** | paired / cluster bootstrap CI |
+| **C** | fixed slices + CI-aware gate + retention report |
+
+**P1 不做：** IndoMMLU 接入、鲁棒扰动、自动 slice discovery。
+
+### P1 (later packs) — Schema + telemetry leftovers
 
 - D0 Integrity（overlap / missing gold / duplicate / class & language coverage）  
-- D1 multi-target + joint success  
+- D1 multi-target + joint as comparable derived target  
 - D2 schema/IF 细分指标  
-- D3 Base↔SFT matrix  
 - D10 基础 timing/usage 写入 PredictionRecord  
-- N2S 完整 Example-01 + toy_extraction  
 
 ### P1.5 — Calibration
 
@@ -452,9 +461,10 @@ README 必须分两表：
 | 1 | `docs/01_project_structure.md` | 结构安排（本文） |
 | 2 | `docs/02_core_contracts.md` | Contract 字段级冻结（含 ScoreRecord / provenance） |
 | 3 | `docs/03_metric_denominators.md` | coverage / semantic / strict（P0.5-C） |
-| 4 | Offline kernel + numbered configs/results | P0 + P0.5 验收 |
-| 5 | P1 Paired Regression + Statistics | Base↔SFT + CI 基建 |
-| 6 | `docs/04_dimension_contracts.md` | D0–D10 各一页 Contract |
+| 4 | `docs/04_paired_regression_p1a.md` | baseline/candidate paired kernel（P1-A） |
+| 5 | Offline kernel + compare configs `05_`/`06_` | P0.5 + P1-A 验收 |
+| 6 | P1-B/C Statistics + slices + gate | 下一步 |
+| 7 | `docs/05_dimension_contracts.md` | D0–D10 各一页 Contract（planned） |
 
 ### Naming habit（硬性）
 
@@ -479,3 +489,5 @@ configs/examples/NN_verb_object.yaml
 5. P0 以 **offline scoring kernel** 为主，双/三验收（N2S replay + toy multiclass + metric swap）。  
 6. Inspect / lm-eval = optional adapters。  
 7. Report = Markdown first。  
+8. P1-A：Kernel 角色名 `baseline`/`candidate`；单 `compare.target`；semantic 默认；sample_id 严格对齐；applicable 排除四格；产物编号 `05_`/`06_`。  
+9. N2S P1-A reference：`content_Indonesian_multi_skill_qwen3_4b_base_en.json` vs `qwen3_4b_test3.json`（同评测集；不完整 base run 会被严格对齐拒绝）。  

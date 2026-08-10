@@ -111,3 +111,18 @@ See `docs/03_metric_denominators.md`.
 | strict | all with_prediction | counts as incorrect |
 
 Artifacts: `data_audit.json`, `business_metrics.coverage`, `business_metrics.metrics_by_mode`.
+
+## 11. ComparisonRecord (P1-A)
+
+See `docs/04_paired_regression_p1a.md`.
+
+Paired offline regression over **baseline** vs **candidate** (display may say Base/SFT).
+
+| Field | Notes |
+|-------|------|
+| sample_id / target | single `compare.target` |
+| applicable | from TaskSpec condition |
+| baseline / candidate | `{pred, correct}` |
+| transition | `stable_correct` \| `gain` \| `regression` \| `both_wrong` (eligible only) |
+
+Alignment: default **strict** sample_id equality or run FAIL.
