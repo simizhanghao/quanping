@@ -1,0 +1,4 @@
+{"sample_id": "c01", "input": {"text": "I want a refund"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}
+{"sample_id": "c02", "input": {"text": "Where is my package"}, "gold": {"intent_class": "shipping"}, "meta": {"language": "en"}}
+{"sample_id": "c03", "input": {"text": "Reset password"}, "gold": {"intent_class": "account"}, "meta": {"language": "en"}}
+{"sample_id": "c04", "input": {"text": "Money back please"}, "gold": {"intent_class": "refund"}, "meta": {"language": "en"}}

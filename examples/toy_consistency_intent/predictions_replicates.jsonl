@@ -1,0 +1,12 @@
+{"sample_id": "c01", "model_id": "toy_rep", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 0}}
+{"sample_id": "c01", "model_id": "toy_rep", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 1}}
+{"sample_id": "c01", "model_id": "toy_rep", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 2}}
+{"sample_id": "c02", "model_id": "toy_rep", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 0}}
+{"sample_id": "c02", "model_id": "toy_rep", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 1}}
+{"sample_id": "c02", "model_id": "toy_rep", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 2}}
+{"sample_id": "c03", "model_id": "toy_rep", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 0}}
+{"sample_id": "c03", "model_id": "toy_rep", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 1}}
+{"sample_id": "c03", "model_id": "toy_rep", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 2}}
+{"sample_id": "c04", "model_id": "toy_rep", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 0}}
+{"sample_id": "c04", "model_id": "toy_rep", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 1}}
+{"sample_id": "c04", "model_id": "toy_rep", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}, "meta": {"replicate": 2}}

@@ -1,0 +1,8 @@
+{"sample_id": "d01", "model_id": "toy_noctx", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d02", "model_id": "toy_noctx", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d03", "model_id": "toy_noctx", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d04", "model_id": "toy_noctx", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d05", "model_id": "toy_noctx", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d06", "model_id": "toy_noctx", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d07", "model_id": "toy_noctx", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "d08", "model_id": "toy_noctx", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}}

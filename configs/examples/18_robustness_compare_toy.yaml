@@ -1,0 +1,24 @@
+run_id: robustness_compare_toy
+packs: [robustness_compare]
+# Shared variants — both models must be scored on this exact set.
+source:
+  samples: ../../examples/toy_metamorphic_intent/samples.jsonl
+  variants: ../../examples/toy_metamorphic_intent/variants.jsonl
+baseline:
+  source:
+    predictions: ../../examples/toy_metamorphic_intent/predictions_clean_baseline.jsonl
+    variant_predictions: ../../examples/toy_metamorphic_intent/predictions_variant_baseline.jsonl
+candidate:
+  source:
+    predictions: ../../examples/toy_metamorphic_intent/predictions_clean_candidate.jsonl
+    variant_predictions: ../../examples/toy_metamorphic_intent/predictions_variant_candidate.jsonl
+task_spec: ../../examples/toy_metamorphic_intent/task.yaml
+output_spec: ../../examples/toy_metamorphic_intent/output.yaml
+metric_spec: ../../examples/toy_metamorphic_intent/metrics.yaml
+parse:
+  mode: from_parsed
+relation:
+  type: invariance
+  targets:
+    - intent_class
+output_dir: results/18_robustness_compare_toy

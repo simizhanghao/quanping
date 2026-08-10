@@ -144,4 +144,11 @@ def test_toy_invariance_known_rates():
     assert block["accuracy_clean"] == pytest.approx(1.0)
     assert block["accuracy_perturbed"] == pytest.approx(0.75)
     assert block["delta_accuracy"] == pytest.approx(-0.25)
-    assert block["robust_success_rate"] == pytest.approx(0.75)
+    assert block["variant_all_correct_rate"] == pytest.approx(0.75)
+    assert block["end_to_end_robust_success_rate"] == pytest.approx(0.75)
+    assert "metrics" in m and "clean" in m["metrics"]
+    assert "intent_class" in m["metrics"]["clean"]["targets"]
+    assert "macro_f1" in m["metrics"]["clean"]["targets"]["intent_class"]
+    assert block["transitions"].get("robustness_regression") == 2
+    assert block["transitions"].get("stable_correct") == 6
+

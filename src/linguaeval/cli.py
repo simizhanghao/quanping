@@ -8,12 +8,16 @@ from linguaeval.compare.alignment import AlignmentError
 from linguaeval.compare.protocol import ComparisonProtocolError
 from linguaeval.core.compare_runner import run_offline_compare
 from linguaeval.core.confidence_runner import run_offline_confidence
+from linguaeval.core.consistency_runner import run_offline_consistency
+from linguaeval.core.context_runner import run_offline_context
 from linguaeval.core.operating_point_runner import run_offline_operating_point
 from linguaeval.core.perturb_runner import run_offline_perturb
+from linguaeval.core.robustness_compare_runner import run_offline_robustness_compare
 from linguaeval.core.robustness_runner import run_offline_robustness
 from linguaeval.core.selective_runner import run_offline_selective
 from linguaeval.core.runner import run_offline_score
 from linguaeval.confidence.operating_point import OperatingPointError
+from linguaeval.robustness.compare import VariantFingerprintError
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -58,6 +62,24 @@ def main(argv: list[str] | None = None) -> int:
         help="Metamorphic robustness eval on clean+variant predictions (P2-A/B)",
     )
     p_rob.add_argument("config", type=str, help="Path to robustness YAML config")
+
+    p_rcmp = sub.add_parser(
+        "robustness-compare-offline",
+        help="Paired baseline vs candidate robustness (shared variant_fingerprint; P2-D)",
+    )
+    p_rcmp.add_argument("config", type=str, help="Path to robustness-compare YAML config")
+
+    p_cons = sub.add_parser(
+        "consistency-offline",
+        help="Self-consistency on repeated predictions (D8 / P2-E)",
+    )
+    p_cons.add_argument("config", type=str, help="Path to consistency YAML config")
+
+    p_ctx = sub.add_parser(
+        "context-offline",
+        help="Context ablation with_context vs without_context (D6 / P2-E)",
+    )
+    p_ctx.add_argument("config", type=str, help="Path to context YAML config")
 
     args = parser.parse_args(argv)
     if args.command == "score-offline":
@@ -116,6 +138,34 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"[linguaeval] see: {out / 'robustness_metrics.json'}, "
             f"{out / 'robustness_records.jsonl'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "robustness-compare-offline":
+        try:
+            out = run_offline_robustness_compare(Path(args.config))
+        except VariantFingerprintError as e:
+            print(f"[linguaeval] robustness-compare FAILED ({e.reason}): {e}", file=sys.stderr)
+            return 2
+        print(f"[linguaeval] offline robustness-compare written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'robustness_compare_metrics.json'}, "
+            f"{out / 'robustness_compare_records.jsonl'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "consistency-offline":
+        out = run_offline_consistency(Path(args.config))
+        print(f"[linguaeval] offline consistency written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'consistency_metrics.json'}, "
+            f"{out / 'consistency_records.jsonl'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "context-offline":
+        out = run_offline_context(Path(args.config))
+        print(f"[linguaeval] offline context written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'context_metrics.json'}, "
+            f"{out / 'context_records.jsonl'}, {out / 'report.md'}"
         )
         return 0
     return 2

@@ -1,0 +1,6 @@
+metrics:
+  intent_class:
+    - accuracy
+    - macro_f1
+round_digits: 4
+exclude_format_fail: true

@@ -3,9 +3,14 @@ packs: [perturb]
 source:
   samples: ../../examples/toy_metamorphic_intent/samples.jsonl
 seed: 42
-semantic_validity: AUTO_VALIDATED
+semantic_validity_if_changed: AUTO_VALIDATED
 perturbations:
   - id: case_lower
+    severity: 1
   - id: strip_punctuation
+    severity: 1
+    params:
+      note: ascii_punct
   - id: collapse_whitespace
+    severity: 1
 output_dir: results/16_perturb_toy_surface

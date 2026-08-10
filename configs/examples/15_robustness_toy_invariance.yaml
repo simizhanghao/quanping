@@ -7,6 +7,7 @@ source:
   variant_predictions: ../../examples/toy_metamorphic_intent/predictions_variant.jsonl
 task_spec: ../../examples/toy_metamorphic_intent/task.yaml
 output_spec: ../../examples/toy_metamorphic_intent/output.yaml
+metric_spec: ../../examples/toy_metamorphic_intent/metrics.yaml
 parse:
   mode: from_parsed
 relation:
@@ -16,4 +17,5 @@ relation:
 bootstrap:
   n_boot: 200
   seed: 42
+  cluster_path: sample
 output_dir: results/15_robustness_toy_invariance

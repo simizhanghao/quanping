@@ -1,0 +1,14 @@
+run_id: context_toy_intent
+packs: [context]
+source:
+  samples: ../../examples/toy_context_intent/samples.jsonl
+  predictions_without_context: ../../examples/toy_context_intent/predictions_without_context.jsonl
+  predictions_with_context: ../../examples/toy_context_intent/predictions_with_context.jsonl
+task_spec: ../../examples/toy_context_intent/task.yaml
+output_spec: ../../examples/toy_context_intent/output.yaml
+parse:
+  mode: from_parsed
+context:
+  target: intent_class
+  denominator: semantic
+output_dir: results/20_context_toy_intent

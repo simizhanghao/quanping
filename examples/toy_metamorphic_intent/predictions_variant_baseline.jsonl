@@ -1,0 +1,9 @@
+{"sample_id": "s01__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s02__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s03__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s04__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s05__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s06__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s07__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "shipping"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s08__case_lower__01", "model_id": "toy_base", "parsed": {"intent_class": "account"}, "format": {"parse_ok": true, "schema_ok": true}}
+{"sample_id": "s01__invalid__01", "model_id": "toy_base", "parsed": {"intent_class": "refund"}, "format": {"parse_ok": true, "schema_ok": true}}

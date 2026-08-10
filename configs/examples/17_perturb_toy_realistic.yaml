@@ -1,0 +1,24 @@
+run_id: perturb_toy_realistic
+packs: [perturb]
+source:
+  samples: ../../examples/toy_metamorphic_intent/samples.jsonl
+seed: 42
+semantic_validity_if_changed: AUTO_VALIDATED
+perturbations:
+  - id: typo
+    severity: 2
+    params:
+      protected_tokens: [Refund, Package, Password]
+  - id: code_switch
+    severity: 1
+    params:
+      lexicon_path: ../../examples/plugins/lexicons/en_light_code_switch.json
+      max_swaps: 2
+  - id: context_distractor
+    severity: 1
+    params:
+      position: prefix
+      distractors:
+        - "Just checking —"
+        - "Quick follow-up:"
+output_dir: results/17_perturb_toy_realistic

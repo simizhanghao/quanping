@@ -1,4 +1,4 @@
-# Toy Metamorphic Intent (P2-A)
+# Toy Metamorphic Intent (P2-A / P2-D)
 
 Hand-authored `case_lower` variants (transform engine lands in P2-B).
 
@@ -16,4 +16,14 @@ robust_success_rate = 0.75
 ```bash
 PYTHONPATH=src python -m linguaeval robustness-offline \
   configs/examples/15_robustness_toy_invariance.yaml
+```
+
+## P2-D compare (baseline vs candidate)
+
+Same `variants.jsonl`. Baseline matches the rates above; candidate fixes the two flips
+→ `robustness_gain=2`, Δ flip_rate = `-0.25`.
+
+```bash
+PYTHONPATH=src python -m linguaeval robustness-compare-offline \
+  configs/examples/18_robustness_compare_toy.yaml
 ```

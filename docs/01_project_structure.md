@@ -95,9 +95,9 @@
 | D3 | Regression | `ModelComparator` | 任意 metric 的 Δ | P1 **必做** |
 | D4 | Language | `LanguagePack` | 目标语能力 | P3 planned |
 | D5 | Robustness | `robustness-offline` | Flip / Violation / Δ / robust_success | P2-A done |
-| D6 | Context | `ConversationRunner` | context strategy | P2 planned |
+| D6 | Context | `context-offline` | with/without ablation | P2-E done |
 | D7 | Calibration | `confidence-offline` | ECE/Brier/NLL/AUROC（P1.5-B）；曲线 → C/D | P1.5-B done |
-| D8 | Consistency | `Repeat/MetamorphicRunner` | agreement / flip | P2/P3 planned |
+| D8 | Consistency | `consistency-offline` | pairwise / all_agree / majority | P2-E done |
 | D9 | Safety | `SafetyPack` | unsafe / over-refusal | P4 planned |
 | D10 | Efficiency | `Profiler` | TTFT/p95/VRAM | P1 telemetry → P4 完整 |
 
@@ -417,9 +417,10 @@ LlamaFactory/tests/yewupingce/n2s_test/
 |-------|------|
 | **A** | Contract + Registry + invariance offline（`robustness-offline`） |
 | **B** | Deterministic surface: case / punctuation / whitespace（`perturb-offline`）+ Flip CI |
-| **C** | Realistic perturbations + semantic_validity + severity |
+| **C0** | Semantics hardening：ScoreRecord / MetricSpec / NO-OP / params / cluster_path |
+| **C** | Realistic: typo, code-switch, context distractor |
 | **D** | Robustness Regression（复用 P1 compare） |
-| **E** | D6 Context + D8 Consistency |
+| **E** | D6 Context + D8 Consistency | done (`docs/14_context_consistency_p2e.md`) |
 
 ### P3 — Multilingual
 
@@ -504,7 +505,11 @@ README 必须分两表：
 | 12 | `docs/12_selective_prediction_p15d.md` | P1.5-D selective / Risk-Coverage |
 | 13 | `docs/13_metamorphic_reliability_p2.md` | P2 metamorphic plan + P2-A |
 | 14 | P2-B surface transforms | done (`perturb-offline`) |
-| 15 | P2-C realistic perturbations | 下一步 |
+| 15 | P2-C0 semantics hardening | done |
+| 16 | P2-C realistic perturbations | done (typo/code_switch/distractor) |
+| 17 | P2-D Robustness Regression | done |
+| 18 | P2-E Context + Consistency | done |
+| 19 | P3 Multilingual / next track | 下一步 |
 | 15 | `docs/14_dimension_contracts.md` | D0–D10 一页纸 Contract（planned） |
 
 ### Naming habit（硬性）

@@ -1,0 +1,8 @@
+{"sample_id": "d01", "input": {"text": "refund it"}, "gold": {"intent_class": "refund"}, "conversation": {"dialogue_id": "dlg1", "turn_id": 2, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d02", "input": {"text": "and the package?"}, "gold": {"intent_class": "shipping"}, "conversation": {"dialogue_id": "dlg1", "turn_id": 3, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d03", "input": {"text": "reset pwd"}, "gold": {"intent_class": "account"}, "conversation": {"dialogue_id": "dlg2", "turn_id": 1, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d04", "input": {"text": "money back"}, "gold": {"intent_class": "refund"}, "conversation": {"dialogue_id": "dlg2", "turn_id": 2, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d05", "input": {"text": "track order"}, "gold": {"intent_class": "shipping"}, "conversation": {"dialogue_id": "dlg3", "turn_id": 1, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d06", "input": {"text": "change email"}, "gold": {"intent_class": "account"}, "conversation": {"dialogue_id": "dlg3", "turn_id": 2, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d07", "input": {"text": "cancel refund"}, "gold": {"intent_class": "refund"}, "conversation": {"dialogue_id": "dlg4", "turn_id": 1, "context_mode": "window"}, "meta": {"language": "en"}}
+{"sample_id": "d08", "input": {"text": "late delivery"}, "gold": {"intent_class": "shipping"}, "conversation": {"dialogue_id": "dlg4", "turn_id": 2, "context_mode": "window"}, "meta": {"language": "en"}}

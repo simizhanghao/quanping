@@ -44,17 +44,19 @@ PYTHONPATH=src python -m pytest -q
 | Selective prediction / Risk-Coverage (`selective-offline`) | Supported (P1.5-D) |
 | Metamorphic robustness contract (`robustness-offline`) | Supported (P2-A) |
 | Deterministic surface perturb (`perturb-offline`) | Supported (P2-B) |
+| Robustness semantics hardening (ScoreRecord/MetricSpec/NO-OP) | Supported (P2-C0) |
+| Realistic perturbations typo/code_switch/distractor | Supported (P2-C) |
+| Robustness compare Base↔SFT (`variant_fingerprint`) | Supported (P2-D) |
+| Context ablation / self-consistency | Supported (P2-E) |
 
-**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `indonesian_n2s` (reference).
+**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration`, `toy_operating_point`, `toy_metamorphic_intent`, `toy_consistency_intent`, `toy_context_intent`, `indonesian_n2s` (reference).
 
 ## Planned (not supported yet)
 
 | Capability | Phase |
 |------------|-------|
-| Realistic / multilingual perturbations | P2-C |
-| Robustness regression Base↔SFT | P2-D |
-| Context + Consistency (D6/D8) | P2-E |
-| Metamorphic robustness / consistency | P2 |
+| Colloquial / real ASR packs | later |
+| Online conversation prompt assembly | later |
 | Multilingual language packs (IndoMMLU etc.) | P3 |
 | Production profiling + rich release cards | P4 |
 | Online model inference in-core | later adapters |
@@ -78,6 +80,7 @@ PYTHONPATH=src python -m pytest -q
 | `docs/11_operating_point_p15c.md` | P1.5-C operating point / threshold |
 | `docs/12_selective_prediction_p15d.md` | P1.5-D selective / Risk-Coverage |
 | `docs/13_metamorphic_reliability_p2.md` | P2 metamorphic plan + hard rules |
+| `docs/14_context_consistency_p2e.md` | P2-E D6 context + D8 consistency |
 
 ## Design hard rules
 

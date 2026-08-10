@@ -1,4 +1,4 @@
-"""Offline metamorphic robustness evaluation (P2-A)."""
+"""Offline metamorphic robustness evaluation (P2-A/B/C0)."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from linguaeval.core.fingerprint import build_provenance
 from linguaeval.core.manifest import write_json, write_manifest
 from linguaeval.core.schema import (
     MetamorphicRelationSpec,
+    MetricSpec,
     OutputSpec,
     RunManifest,
     TaskSpec,
@@ -21,6 +22,7 @@ from linguaeval.core.schema import (
 )
 from linguaeval.parse.pipeline import apply_output_spec
 from linguaeval.robustness.aggregate import aggregate_robustness, build_robustness_records
+from linguaeval.robustness.generate import variant_fingerprint
 from linguaeval.robustness.registry import ensure_builtin_perturbation_specs, list_perturbations
 
 
@@ -66,6 +68,17 @@ def run_offline_robustness(config_path: Path) -> Path:
         raise FileNotFoundError(f"task_spec not found: {task_path}")
     task = TaskSpec.from_dict(_load_yaml(task_path))
 
+    metric_path = _resolve(root, cfg.get("metric_spec") or cfg.get("metrics"))
+    if metric_path and metric_path.is_file():
+        metric_spec = MetricSpec.from_dict(_load_yaml(metric_path))
+    else:
+        # default: accuracy (+ macro_f1 when multiclass-friendly)
+        default_metrics = {
+            t.name: (["accuracy", "macro_f1"] if t.type == "multiclass" else ["accuracy"])
+            for t in task.targets
+        }
+        metric_spec = MetricSpec(metrics=default_metrics, round_digits=4)
+
     rel_cfg = dict(cfg.get("relation") or cfg.get("metamorphic") or {})
     if not rel_cfg.get("targets"):
         rel_cfg["targets"] = [t.name for t in task.targets]
@@ -108,9 +121,19 @@ def run_offline_robustness(config_path: Path) -> Path:
         task=task,
         relation=relation,
     )
-    metrics = aggregate_robustness(records, bootstrap=dict(cfg.get("bootstrap") or {}))
+    metrics = aggregate_robustness(
+        records,
+        samples=samples,
+        clean_preds=clean_preds,
+        variants=variants,
+        variant_preds=variant_preds,
+        task=task,
+        metric_spec=metric_spec,
+        bootstrap=dict(cfg.get("bootstrap") or {}),
+    )
     metrics["relation"] = {"type": relation.type, "targets": relation.targets}
     metrics["registry_perturbations"] = list_perturbations()
+    metrics["variant_fingerprint"] = variant_fingerprint(variants)
 
     out_dir = _resolve_out_dir(config_path, cfg.get("output_dir") or "results/15_robustness")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -136,20 +159,25 @@ def run_offline_robustness(config_path: Path) -> Path:
         f"- targets: `{relation.targets}`",
         f"- n_records: {metrics.get('coverage', {}).get('n_records')}",
         f"- n_applicable: {metrics.get('coverage', {}).get('n_applicable')}",
+        f"- bootstrap_cluster_path: `{metrics.get('bootstrap_cluster_path')}`",
         "",
     ]
     for tname, block in (metrics.get("by_target") or {}).items():
         lines += [
             f"## Target `{tname}`",
             "",
-            f"- accuracy_clean: `{block.get('accuracy_clean')}`",
-            f"- accuracy_perturbed: `{block.get('accuracy_perturbed')}`",
-            f"- delta_accuracy: `{block.get('delta_accuracy')}`",
             f"- flip_rate: `{block.get('flip_rate')}`",
             f"- metamorphic_violation_rate: `{block.get('metamorphic_violation_rate')}`",
-            f"- robust_success_rate: `{block.get('robust_success_rate')}`",
+            f"- variant_all_correct_rate: `{block.get('variant_all_correct_rate')}`",
+            f"- end_to_end_robust_success_rate: `{block.get('end_to_end_robust_success_rate')}`",
+            f"- transitions: `{block.get('transitions')}`",
             "",
         ]
+    if metrics.get("by_perturbation"):
+        lines += ["## By perturbation", ""]
+        for pid, block in metrics["by_perturbation"].items():
+            lines.append(f"- `{pid}`: flip={block.get('flip_rate')} viol={block.get('metamorphic_violation_rate')}")
+        lines.append("")
     report_path = out_dir / "report.md"
     report_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -158,7 +186,7 @@ def run_offline_robustness(config_path: Path) -> Path:
         cfg=cfg,
         task_path=task_path,
         output_path=output_path,
-        metric_path=None,
+        metric_path=metric_path,
         sample_dicts=[s.to_dict() for s in samples],
         prediction_dicts=[p.to_dict() for p in clean_preds],
     )

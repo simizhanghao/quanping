@@ -1,0 +1,13 @@
+run_id: consistency_toy_intent
+packs: [consistency]
+source:
+  samples: ../../examples/toy_consistency_intent/samples.jsonl
+  predictions: ../../examples/toy_consistency_intent/predictions_replicates.jsonl
+task_spec: ../../examples/toy_consistency_intent/task.yaml
+output_spec: ../../examples/toy_consistency_intent/output.yaml
+parse:
+  mode: from_parsed
+consistency:
+  target: intent_class
+  min_replicates: 2
+output_dir: results/19_consistency_toy_intent

@@ -1,85 +1,109 @@
 # P2 Metamorphic Reliability — Plan & Hard Rules
 
-**Status:** P2-A in progress  
 **Principle (P11):** Kernel 能力必须先过非 N2S 验收；业务只经 Adapter / Pack / 配置进入。
 
 ## Architecture
 
 ```text
-Original Sample
+SampleRecord
       ↓
-PerturbationSpec  (how to transform — Registry, not Kernel if/else)
+PerturbationSpec (Registry impl + YAML runtime params)
       ↓
-VariantRecord     (lineage: parent, seed, severity, validity)
+VariantRecord (validity / NO-OP / applicability)
       ↓
-external inference (offline; ModelAdapter later)
+external inference
       ↓
-MetamorphicRelationSpec  (what must hold — invariance v0)
+ScoreRecord (reuse D1 scorer — not a second correctness world)
       ↓
-RobustnessRecord
+MetamorphicRelation
       ↓
-Aggregate (+ reuse P1 bootstrap in P2-B+)
+RobustnessRecord (+ transitions)
+      ↓
+MetricSpec aggregates + Flip/Violation (+ P1 bootstrap)
 ```
 
-**Perturbation ≠ Robustness.** Robustness = perturbation + metamorphic relation.
+**Perturbation ≠ Robustness.** Business correctness comes from **ScoreRecord**; P2 only compares clean↔perturbed behavior.
 
 ## Slice plan
 
-| Slice | Scope |
-|-------|--------|
-| **A** | Contract + Registry + invariance offline eval（本文件） |
-| **B** | Deterministic surface: case / punctuation / whitespace + Flip/Violation/Δ + bootstrap |
-| **C** | Realistic: typo/ASR, colloquial, code-switch, distractor + `semantic_validity` + severity |
-| **D** | Robustness Regression（Base↔SFT，复用 P1 compare） |
-| **E** | D6 Context + D8 Consistency → Reliability Trio |
+| Slice | Scope | Status |
+|-------|--------|--------|
+| **A** | Contract + Registry + invariance offline | ✅ |
+| **B** | Deterministic surface `perturb-offline` | ✅ |
+| **C0** | Semantics hardening (ScoreRecord / MetricSpec / NO-OP / params / cluster) | ✅ |
+| **C** | Realistic: typo, code-switch, context distractor | ✅ (first batch) |
+| **D** | Base↔SFT Robustness Regression (`variant_fingerprint`) | ✅ |
+| **E** | D6 Context + D8 Consistency | ✅ |
 
-## P2-A deliverables
-
-```text
-PerturbationSpec
-VariantRecord
-MetamorphicRelationSpec   # invariance implemented; directional reserved
-RobustnessRecord
-Perturbation Registry     # metadata; apply() deferred to P2-B
-robustness-offline CLI
-toy metamorphic intent (hand-authored variants; no LLM paraphrase)
-```
-
-**Out of P2-A:** case/punct/whitespace engines, typo/ASR, online inference, bootstrap CI, robustness regression.
-
-## P2-B (done)
+## Offline CLI
 
 ```text
-case_lower / strip_punctuation / collapse_whitespace  apply()
-perturb-offline → variants.jsonl + variant_fingerprint
-robustness-offline bootstrap Flip/Violation CI (reuse P1 resample_indices)
+linguaeval perturb-offline              → variants.jsonl + variant_manifest.json
+# external model
+linguaeval robustness-offline           → robustness_metrics.json / records / violations
+linguaeval robustness-compare-offline   → Base↔Candidate Δ + shared fingerprint gate
+linguaeval consistency-offline          → D8 replicate agreement (P2-E)
+linguaeval context-offline              → D6 with/without context ablation (P2-E)
 ```
 
-**Still out:** typo/ASR/colloquial, online inference, robustness regression (P2-C/D).
+See also `docs/14_context_consistency_p2e.md`.
 
-## Hard pitfalls (locked)
-
-1. **No perturbation-name branches in Kernel** — Registry only.  
-2. **Do not assume all perturbations preserve semantics** — need relation + `semantic_validity`.  
-3. **Never compare raw_output equality** — compare TaskSpec **targets**.  
-4. **Not only ΔAccuracy/F1** — FlipRate + Metamorphic ViolationRate.  
-5. **Reproducible randomness** — `seed` + `transform_version` in manifest.  
-6. **Shared variant set for Base/SFT** — same `variant_fingerprint` (P2-D).  
-7. **Invalid variants must not enter denominator** — report generated / valid / evaluated.  
-8. **Deterministic first** — no LLM paraphrase/judge in P2-A/B.
-
-## Offline CLI shape
+## P2-D Robustness Compare
 
 ```text
-# P2-B+:
-linguaeval perturb-offline   → variants.jsonl
-# external model run
-linguaeval robustness-offline → robustness_metrics.json / records / violations
+linguaeval robustness-compare-offline <config.yaml>
 ```
 
-P2-A ships **robustness-offline** only（variants 可手写）。
+Hard gate: baseline and candidate must share the **same** `variants.jsonl`
+(`variant_fingerprint`). Roles are `baseline` / `candidate` (display may say Base/SFT).
 
-## Validity gate
+Artifacts:
 
-Only `semantic_validity ∈ {VERIFIED, AUTO_VALIDATED}` enter formal robustness denominators.  
-`UNVERIFIED` / `INVALID` → coverage audit, excluded from Flip/Violation.
+```text
+robustness_compare_metrics.json   # Δ rates + transitions
+robustness_compare_records.jsonl
+robustness_gain_cases.jsonl
+robustness_regression_cases.jsonl
+both_fragile_cases.jsonl
+stable_robust_cases.jsonl
+baseline_robustness_metrics.json
+candidate_robustness_metrics.json
+report.md
+```
+
+Model-level transitions (on `relation_satisfied`):
+
+```text
+stable_robust | robustness_gain | robustness_regression | both_fragile
+```
+
+Δ rates are **candidate − baseline** (negative `flip_rate` = candidate more invariant).
+
+## P2-C first batch
+
+```text
+typo              — severity edit budget + protected_tokens
+code_switch       — lexicon / lexicon_path plugin data (not Kernel if/else)
+context_distractor — allowlisted distractor phrases only
+```
+
+Deferred: colloquial / ASR (harder semantic validity).
+
+## P2-C0 checklist (locked)
+
+1. Correctness via `build_score_records` / ScoreRecord — not ad-hoc string equality in P2  
+2. Clean/perturbed metrics via `MetricSpec` + `score_targets` — not accuracy-only  
+3. YAML `severity` / `params` / `applies_to` fully consumed  
+4. Applicability + **NO-OP** → `semantic_validity=NOT_APPLICABLE` (out of denominator)  
+5. Per-variant validation (changed ⇒ AUTO_VALIDATED for deterministic surface; no global blind trust)  
+6. Split `variant_all_correct_rate` vs `end_to_end_robust_success_rate`  
+7. Bootstrap `cluster_path` configurable (reuse P1 `resample_indices`)
+
+## Hard rules (P2 PR gate)
+
+1. Kernel: no Indonesian / N2S / banking / ASR-business branches  
+2. New perturbation: non-N2S smoke first  
+3. Declare `semantic_policy` / applicability / severity / validation  
+4. NO-OP not in formal denominator  
+5. Base/Candidate robustness compare requires shared `variant_fingerprint` (P2-D)  
+6. Do not reimplement scorer/bootstrap — reuse D0/D1/P1  

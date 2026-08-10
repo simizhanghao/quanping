@@ -412,6 +412,7 @@ class PerturbationSpec:
     semantic_policy: str = "preserve"  # preserve | change | unknown
     transform_version: str = "1"
     params: Dict[str, Any] = field(default_factory=dict)
+    applies_to: Dict[str, Any] = field(default_factory=dict)  # e.g. {input_type: natural_text}
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "PerturbationSpec":
@@ -425,10 +426,24 @@ class PerturbationSpec:
             semantic_policy=str(d.get("semantic_policy") or "preserve"),
             transform_version=str(d.get("transform_version") or "1"),
             params=dict(d.get("params") or {}),
+            applies_to=dict(d.get("applies_to") or {}),
         )
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+    def merged_with(self, override: "PerturbationSpec") -> "PerturbationSpec":
+        """Registry defaults ← YAML runtime override (id must match)."""
+        return PerturbationSpec(
+            id=self.id,
+            category=override.category or self.category,
+            severity=override.severity if override.severity is not None else self.severity,
+            seed=override.seed if override.seed is not None else self.seed,
+            semantic_policy=override.semantic_policy or self.semantic_policy,
+            transform_version=override.transform_version or self.transform_version,
+            params={**self.params, **override.params},
+            applies_to=override.applies_to or self.applies_to,
+        )
 
 
 @dataclass
@@ -514,6 +529,8 @@ class RobustnessRecord:
     flipped: bool = False
     relation_type: str = "invariance"
     relation_satisfied: Optional[bool] = None
+    transition: Optional[str] = None  # stable_correct|perturbation_gain|robustness_regression|stable_wrong
+    severity: int = 1
     semantic_validity: str = "UNVERIFIED"
     applicable: bool = True
     exclusion: Optional[str] = None
