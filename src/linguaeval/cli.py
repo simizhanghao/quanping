@@ -8,7 +8,9 @@ from linguaeval.compare.alignment import AlignmentError
 from linguaeval.compare.protocol import ComparisonProtocolError
 from linguaeval.core.compare_runner import run_offline_compare
 from linguaeval.core.confidence_runner import run_offline_confidence
+from linguaeval.core.operating_point_runner import run_offline_operating_point
 from linguaeval.core.runner import run_offline_score
+from linguaeval.confidence.operating_point import OperatingPointError
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,6 +31,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Extract confidence + calibration metrics (ECE/Brier/NLL/AUROC)",
     )
     p_conf.add_argument("config", type=str, help="Path to confidence YAML config")
+
+    p_op = sub.add_parser(
+        "operating-point-offline",
+        help="Select threshold / operating point (P1.5-C; never optimize on test)",
+    )
+    p_op.add_argument("config", type=str, help="Path to operating-point YAML config")
 
     args = parser.parse_args(argv)
     if args.command == "score-offline":
@@ -54,6 +62,18 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"[linguaeval] see: {out / 'calibration_metrics.json'}, "
             f"{out / 'confidence_audit.json'}, {out / 'report.md'}"
+        )
+        return 0
+    if args.command == "operating-point-offline":
+        try:
+            out = run_offline_operating_point(Path(args.config))
+        except OperatingPointError as e:
+            print(f"[linguaeval] operating-point FAILED ({e.reason}): {e}", file=sys.stderr)
+            return 2
+        print(f"[linguaeval] offline operating-point written to: {out}")
+        print(
+            f"[linguaeval] see: {out / 'operating_points.json'}, "
+            f"{out / 'threshold_curve.json'}, {out / 'report.md'}"
         )
         return 0
     return 2

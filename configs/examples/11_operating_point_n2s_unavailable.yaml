@@ -1,0 +1,25 @@
+# Free-gen N2S has no class scores → operating point NOT_AVAILABLE.
+run_id: operating_point_n2s_unavailable
+packs: [operating_point]
+source:
+  adapter: n2s_dialogue_prediction
+  model_id: qwen3_4b_sft
+  path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/qwen3_4b_test3.json
+task_spec: ../../examples/indonesian_n2s/task.yaml
+output_spec: ../../examples/indonesian_n2s/output.yaml
+parse:
+  mode: from_parsed
+confidence:
+  target: n2s
+  source:
+    type: probabilities
+    path: scores.n2s
+  predicted_path: $.n2s
+operating_point:
+  target: n2s
+  positive_class: "true"
+  optimize_on: validation
+  evaluate_on: test
+  selection:
+    mode: best_f1
+output_dir: results/11_operating_point_n2s_unavailable

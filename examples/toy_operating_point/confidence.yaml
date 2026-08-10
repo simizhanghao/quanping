@@ -1,0 +1,6 @@
+target: label
+source:
+  type: probabilities
+  path: scores.label
+predicted_path: $.label
+labels: [legit, fraud]

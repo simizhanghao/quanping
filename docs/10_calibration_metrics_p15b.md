@@ -54,4 +54,7 @@ report.md
 
 ## Out of P1.5-B
 
-Threshold sweep / temperature scaling / Risk-Coverage → P1.5-C/D。
+Threshold / operating point → **P1.5-C**（见 `docs/11_operating_point_p15c.md`）。  
+Selective prediction / Risk-Coverage → P1.5-D。
+
+**Note:** toy calibration N=16 is for **functional validation** only — not model-quality conclusions.

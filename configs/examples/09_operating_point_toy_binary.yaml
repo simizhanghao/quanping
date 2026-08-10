@@ -1,0 +1,13 @@
+run_id: operating_point_toy_binary
+packs: [operating_point]
+source:
+  adapter: jsonl
+  samples: ../../examples/toy_operating_point/samples.jsonl
+  predictions: ../../examples/toy_operating_point/predictions.jsonl
+task_spec: ../../examples/toy_operating_point/task.yaml
+output_spec: ../../examples/toy_operating_point/output.yaml
+confidence_spec: ../../examples/toy_operating_point/confidence.yaml
+operating_point_spec: ../../examples/toy_operating_point/operating_point.yaml
+parse:
+  mode: from_parsed
+output_dir: results/09_operating_point_toy_binary

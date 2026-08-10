@@ -40,14 +40,15 @@ PYTHONPATH=src python -m pytest -q
 | Golden protocol / comparability / metric applicability / gate min-support | Supported |
 | ConfidenceSpec extract (`confidence-offline`) | Supported (P1.5-A) |
 | Calibration metrics ECE / Brier / NLL / AUROC | Supported (P1.5-B) |
+| Operating point / threshold (`operating-point-offline`) | Supported (P1.5-C) |
 
-**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration` (probs), `indonesian_n2s` (reference; confidence usually NOT_AVAILABLE).
+**Examples:** `toy_multiclass`, `toy_extraction`, `toy_compare_intent`, `toy_calibration` (probs), `toy_operating_point` (threshold), `indonesian_n2s` (reference; confidence usually NOT_AVAILABLE).
 
 ## Planned (not supported yet)
 
 | Capability | Phase |
 |------------|-------|
-| Threshold sweep / temperature scaling / Risk-Coverage | P1.5-C/D |
+| Selective prediction / Risk-Coverage | P1.5-D |
 | Metamorphic robustness / consistency | P2 |
 | Multilingual language packs (IndoMMLU etc.) | P3 |
 | Production profiling + rich release cards | P4 |
@@ -69,6 +70,7 @@ PYTHONPATH=src python -m pytest -q
 | `docs/08_evaluation_semantics_p1d.md` | P1-D semantics freeze |
 | `docs/09_confidence_contract_p15a.md` | P1.5-A confidence contract |
 | `docs/10_calibration_metrics_p15b.md` | P1.5-B calibration metrics |
+| `docs/11_operating_point_p15c.md` | P1.5-C operating point / threshold |
 
 ## Design hard rules
 

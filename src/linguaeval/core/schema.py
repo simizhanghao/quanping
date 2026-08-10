@@ -289,6 +289,63 @@ class ConfidenceSpec:
 
 
 @dataclass
+class OperatingPointSpec:
+    """Generic threshold / operating-point selection (P1.5-C).
+
+    Kernel only knows target, positive_class, score, gold, threshold, constraints.
+    """
+
+    target: str
+    positive_class: str
+    optimize_on: str = "validation"  # validation | calibration — never test
+    evaluate_on: str = "test"
+    mode: str = "best_f1"  # best_f1 | best_fbeta | max_recall_at_precision | max_precision_at_recall
+    beta: float = 1.0
+    precision_min: Optional[float] = None
+    recall_min: Optional[float] = None
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "OperatingPointSpec":
+        if not d or not d.get("target"):
+            raise ValueError("OperatingPointSpec.target is required")
+        if not d.get("positive_class"):
+            raise ValueError("OperatingPointSpec.positive_class is required")
+        sel = dict(d.get("selection") or d.get("objective") or {})
+        # allow objective: {maximize: recall} + constraint shorthand
+        mode = str(d.get("mode") or sel.get("mode") or "")
+        if not mode:
+            maximize = str(sel.get("maximize") or "").lower()
+            constraint = dict(d.get("constraint") or sel.get("constraint") or {})
+            if maximize == "recall" and "precision" in constraint:
+                mode = "max_recall_at_precision"
+            elif maximize == "precision" and "recall" in constraint:
+                mode = "max_precision_at_recall"
+            elif maximize in {"f1", "best_f1"}:
+                mode = "best_f1"
+            elif maximize in {"fbeta", "fβ", "best_fbeta"}:
+                mode = "best_fbeta"
+            else:
+                mode = "best_f1"
+        constraint = dict(d.get("constraint") or sel.get("constraint") or {})
+        pmin = constraint.get("precision", {})
+        rmin = constraint.get("recall", {})
+        if isinstance(pmin, dict):
+            pmin = pmin.get("min")
+        if isinstance(rmin, dict):
+            rmin = rmin.get("min")
+        return cls(
+            target=str(d["target"]),
+            positive_class=str(d["positive_class"]),
+            optimize_on=str(d.get("optimize_on") or "validation"),
+            evaluate_on=str(d.get("evaluate_on") or "test"),
+            mode=mode,
+            beta=float(sel.get("beta") or d.get("beta") or 1.0),
+            precision_min=float(pmin) if pmin is not None else None,
+            recall_min=float(rmin) if rmin is not None else None,
+        )
+
+
+@dataclass
 class ConfidenceRecord:
     """Normalized per-sample confidence (decoupled from PredictionRecord)."""
 

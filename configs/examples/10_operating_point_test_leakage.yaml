@@ -1,0 +1,20 @@
+# Must FAIL with status TEST_LEAKAGE — optimize_on=test is forbidden.
+run_id: operating_point_test_leakage
+packs: [operating_point]
+source:
+  adapter: jsonl
+  samples: ../../examples/toy_operating_point/samples.jsonl
+  predictions: ../../examples/toy_operating_point/predictions.jsonl
+task_spec: ../../examples/toy_operating_point/task.yaml
+output_spec: ../../examples/toy_operating_point/output.yaml
+confidence_spec: ../../examples/toy_operating_point/confidence.yaml
+parse:
+  mode: from_parsed
+operating_point:
+  target: label
+  positive_class: fraud
+  optimize_on: test
+  evaluate_on: test
+  selection:
+    mode: best_f1
+output_dir: results/10_operating_point_test_leakage

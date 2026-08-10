@@ -1,0 +1,7 @@
+name: toy_operating_point_binary
+task_type: classification
+targets:
+  - name: label
+    type: binary
+    path: $.label
+    labels: [legit, fraud]

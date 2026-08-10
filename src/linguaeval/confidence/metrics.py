@@ -175,18 +175,26 @@ def compute_calibration_metrics(
 
     if n_usable == 0:
         reason = "confidence_source_unavailable"
-        empty = {
+        discrimination = {
+            "auroc_ovr_macro": _block(STATUS_NOT_AVAILABLE, None, reason=reason),
+        }
+        calibration = {
             "ece": _block(STATUS_NOT_AVAILABLE, None, reason=reason),
             "brier": _block(STATUS_NOT_AVAILABLE, None, reason=reason),
             "nll": _block(STATUS_NOT_AVAILABLE, None, reason=reason),
-            "auroc_ovr_macro": _block(STATUS_NOT_AVAILABLE, None, reason=reason),
+        }
+        diagnostics = {
             "accuracy": _block(STATUS_NOT_AVAILABLE, None, reason=reason),
         }
+        flat = {**discrimination, **calibration, **diagnostics}
         return {
             **base,
             "status": STATUS_NOT_AVAILABLE,
             "reason": reason,
-            "metrics": empty,
+            "discrimination": discrimination,
+            "calibration": calibration,
+            "diagnostics": diagnostics,
+            "metrics": flat,
         }
 
     confidences = [float(r.confidence) for r in usable]
@@ -219,7 +227,8 @@ def compute_calibration_metrics(
     else:
         auc_block = _block(STATUS_AVAILABLE, auc_val, per_class=auc_per)
 
-    metrics = {
+    discrimination = {"auroc_ovr_macro": auc_block}
+    calibration = {
         "ece": _block(
             STATUS_INSUFFICIENT_SUPPORT if insuff else STATUS_AVAILABLE,
             ece_val,
@@ -228,14 +237,17 @@ def compute_calibration_metrics(
         ),
         "brier": _block(STATUS_AVAILABLE, brier_val),
         "nll": _block(STATUS_AVAILABLE, nll_val),
-        "auroc_ovr_macro": auc_block,
-        "accuracy": _block(STATUS_AVAILABLE, acc),
     }
+    diagnostics = {"accuracy": _block(STATUS_AVAILABLE, acc)}
+    flat = {**discrimination, **calibration, **diagnostics}
 
     out: Dict[str, Any] = {
         **base,
         "status": pack_status,
-        "metrics": metrics,
+        "discrimination": discrimination,
+        "calibration": calibration,
+        "diagnostics": diagnostics,
+        "metrics": flat,
     }
     if pack_reason:
         out["reason"] = pack_reason

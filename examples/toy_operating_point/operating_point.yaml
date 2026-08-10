@@ -1,0 +1,9 @@
+target: label
+positive_class: fraud
+optimize_on: validation
+evaluate_on: test
+selection:
+  mode: max_recall_at_precision
+constraint:
+  precision:
+    min: 0.90

@@ -1,0 +1,19 @@
+run_id: operating_point_toy_ovr_refund
+packs: [operating_point]
+source:
+  adapter: jsonl
+  samples: ../../examples/toy_operating_ovr/samples.jsonl
+  predictions: ../../examples/toy_operating_ovr/predictions.jsonl
+task_spec: ../../examples/toy_operating_ovr/task.yaml
+output_spec: ../../examples/toy_operating_ovr/output.yaml
+confidence_spec: ../../examples/toy_operating_ovr/confidence.yaml
+parse:
+  mode: from_parsed
+operating_point:
+  target: intent_class
+  positive_class: refund
+  optimize_on: validation
+  evaluate_on: test
+  selection:
+    mode: best_f1
+output_dir: results/12_operating_point_toy_ovr
