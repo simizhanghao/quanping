@@ -1,11 +1,14 @@
 run_id: n2s_qwen3_4b_offline_replay
 packs: [business, schema]
 source:
-  type: n2s_dialogue_prediction
+  adapter: n2s_dialogue_prediction
   model_id: qwen3_4b_sft
   # Existing prediction artifact (no re-inference)
   path: /data/hanchengcheng/hcc_1/LlamaFactory/tests/yewupingce/n2s_test/n2s_result/qwen3_4b_test3.json
 task_spec: ../../examples/indonesian_n2s/task.yaml
 output_spec: ../../examples/indonesian_n2s/output.yaml
 metric_spec: ../../examples/indonesian_n2s/metrics.yaml
+report:
+  primary_target: n2s
+  primary_metric: f1
 output_dir: results/03_eval_n2s_qwen3_4b_offline

@@ -1,20 +1,15 @@
-"""Offline scoring runner (P0)."""
+"""Offline scoring runner — Kernel has no business-specific branches."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 
 import yaml
 
-from linguaeval.adapters.dataset.jsonl_samples import (
-    load_predictions_jsonl,
-    load_samples_jsonl,
-    write_predictions_jsonl,
-)
-from linguaeval.adapters.dataset.n2s_dialogue import load_n2s_prediction_json
+from linguaeval.adapters.dataset.jsonl_samples import write_predictions_jsonl
+from linguaeval.adapters.dataset.registry import get_adapter
 from linguaeval.core.manifest import write_json, write_manifest
 from linguaeval.core.schema import MetricSpec, OutputSpec, PredictionRecord, RunManifest, SampleRecord, TaskSpec
 from linguaeval.metrics.aggregate import build_business_metrics
@@ -53,23 +48,17 @@ def load_samples_and_preds(
     cfg: Dict[str, Any],
     config_path: Path,
 ) -> Tuple[List[SampleRecord], List[PredictionRecord]]:
+    """Dispatch via DatasetAdapter registry only (no business ifs)."""
     root = config_path.parent
-    source = (cfg.get("source") or {}).get("type") or cfg.get("source_type") or "jsonl"
-
-    if source == "n2s_dialogue_prediction":
-        pred_path = _resolve(root, (cfg.get("source") or {}).get("path") or cfg.get("predictions"))
-        if not pred_path or not pred_path.is_file():
-            raise FileNotFoundError(f"N2S prediction JSON not found: {pred_path}")
-        model_id = ((cfg.get("source") or {}).get("model_id")) or "sft"
-        return load_n2s_prediction_json(pred_path, model_id=model_id)
-
-    samples_path = _resolve(root, cfg.get("samples") or (cfg.get("source") or {}).get("samples"))
-    preds_path = _resolve(root, cfg.get("predictions") or (cfg.get("source") or {}).get("predictions"))
-    if not samples_path or not samples_path.is_file():
-        raise FileNotFoundError(f"samples not found: {samples_path}")
-    if not preds_path or not preds_path.is_file():
-        raise FileNotFoundError(f"predictions not found: {preds_path}")
-    return load_samples_jsonl(samples_path), load_predictions_jsonl(preds_path)
+    source = dict(cfg.get("source") or {})
+    adapter_name = (
+        source.get("adapter")
+        or source.get("type")
+        or cfg.get("source_type")
+        or "jsonl"
+    )
+    adapter = get_adapter(str(adapter_name))
+    return adapter(source, root, cfg)
 
 
 def run_offline_score(config_path: Path) -> Path:
@@ -77,12 +66,11 @@ def run_offline_score(config_path: Path) -> Path:
     samples, preds = load_samples_and_preds(cfg, config_path)
 
     scored = score_targets(samples, preds, task, metric_spec)
-    business = build_business_metrics(scored)
+    business = build_business_metrics(scored, report_cfg=cfg.get("report") or {})
 
     out_dir_raw = cfg.get("output_dir") or "results/01_eval_offline"
     out_dir = Path(out_dir_raw)
     if not out_dir.is_absolute():
-        # prefer repo root (parents of configs/examples)
         repo = config_path.resolve()
         for parent in [repo.parent, *repo.parents]:
             if (parent / "pyproject.toml").exists() or (parent / "src" / "linguaeval").exists():
@@ -93,6 +81,8 @@ def run_offline_score(config_path: Path) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     run_id = cfg.get("run_id") or f"offline_{uuid4().hex[:8]}"
+    source = cfg.get("source") or {}
+    adapter_name = source.get("adapter") or source.get("type") or "jsonl"
     manifest = RunManifest(
         run_id=run_id,
         config_path=str(config_path.resolve()),
@@ -100,9 +90,11 @@ def run_offline_score(config_path: Path) -> Path:
         artifact_index={},
         notes={
             "mode": "offline_score",
+            "adapter": adapter_name,
             "n_samples": len(samples),
             "n_predictions": len(preds),
             "task": task.name,
+            "report": cfg.get("report") or {},
         },
     )
 
@@ -124,7 +116,5 @@ def run_offline_score(config_path: Path) -> Path:
         "report": str(report_path),
     }
     write_manifest(manifest_path, manifest)
-
-    # also dump raw score for debugging
     write_json(out_dir / "score_raw.json", scored)
     return out_dir

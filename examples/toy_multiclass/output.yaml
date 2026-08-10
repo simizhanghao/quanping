@@ -1,6 +1,6 @@
 format: text
 parser: identity
 schema:
-  required: [label]
+  required: [intent_class]
 constraints:
   no_markdown: true

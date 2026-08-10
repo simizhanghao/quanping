@@ -7,9 +7,16 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from linguaeval.core.schema import FormatStatus, PredictionRecord, SampleInput, SampleRecord
+
+
+def _resolve(base: Path, maybe: Optional[str]) -> Optional[Path]:
+    if not maybe:
+        return None
+    p = Path(maybe)
+    return p if p.is_absolute() else (base / p).resolve()
 
 
 def _n2s_knowledge_to_bool(raw: Any) -> bool:
@@ -132,3 +139,18 @@ def load_n2s_prediction_json(
             )
         )
     return samples, preds
+
+
+def load_from_config(
+    source: Dict[str, Any],
+    config_dir: Path,
+    cfg: Dict[str, Any],
+) -> Tuple[List[SampleRecord], List[PredictionRecord]]:
+    """Registry entry for adapter name ``n2s_dialogue_prediction``."""
+    pred_path = _resolve(
+        config_dir, source.get("path") or source.get("predictions") or cfg.get("predictions")
+    )
+    if not pred_path or not pred_path.is_file():
+        raise FileNotFoundError(f"N2S prediction JSON not found: {pred_path}")
+    model_id = str(source.get("model_id") or "sft")
+    return load_n2s_prediction_json(pred_path, model_id=model_id)

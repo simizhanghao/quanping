@@ -24,14 +24,16 @@ def write_report_md(path: Path, *, business: Dict[str, Any], manifest: Dict[str,
             "## Primary Business Metrics",
             "",
             f"- target: `{p.get('target')}`",
-            f"- precision: {p.get('precision')}",
-            f"- recall: {p.get('recall')}",
-            f"- f1: {p.get('f1')}",
-            f"- f2: {p.get('f2')}",
-            f"- accuracy: {p.get('accuracy')}",
-            f"- TP/TN/FP/FN: {p.get('TP')}/{p.get('TN')}/{p.get('FP')}/{p.get('FN')}",
+            f"- metric: `{p.get('metric')}`",
+            f"- value: {p.get('value')}",
             "",
         ]
+        for k in ("precision", "recall", "f1", "f2", "accuracy", "macro_f1", "exact_match"):
+            if k in p and k != p.get("metric"):
+                lines.append(f"- {k}: {p[k]}")
+        if "TP" in p:
+            lines.append(f"- TP/TN/FP/FN: {p.get('TP')}/{p.get('TN')}/{p.get('FP')}/{p.get('FN')}")
+        lines.append("")
     lines += ["## Targets", ""]
     for name, block in (business.get("targets") or {}).items():
         lines.append(f"### `{name}` ({block.get('type')})")

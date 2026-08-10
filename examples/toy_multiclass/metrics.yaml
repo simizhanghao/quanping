@@ -1,5 +1,5 @@
 metrics:
-  label:
+  intent_class:
     - accuracy
     - macro_f1
 round_digits: 4
