@@ -1,0 +1,6 @@
+format: text
+parser: identity
+schema:
+  required: [label]
+constraints:
+  no_markdown: true

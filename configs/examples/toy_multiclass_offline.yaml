@@ -1,0 +1,10 @@
+run_id: toy_multiclass_offline
+packs: [business, schema]
+source:
+  type: jsonl
+samples: ../../examples/toy_multiclass/samples.jsonl
+predictions: ../../examples/toy_multiclass/predictions.jsonl
+task_spec: ../../examples/toy_multiclass/task.yaml
+output_spec: ../../examples/toy_multiclass/output.yaml
+metric_spec: ../../examples/toy_multiclass/metrics.yaml
+output_dir: results/01_eval_toy_multiclass

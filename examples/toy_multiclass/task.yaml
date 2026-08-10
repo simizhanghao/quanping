@@ -1,0 +1,7 @@
+name: toy_intent
+task_type: classification
+targets:
+  - name: label
+    type: multiclass
+    path: $.label
+    labels: [refund, shipping, account]

@@ -436,12 +436,13 @@ README 必须分两表：
 
 | Order | Deliverable | Purpose |
 |------:|-------------|---------|
-| 1 | `docs/01_core_contracts.md` | 7 Contract 字段级冻结 + 示例 YAML/JSON |
-| 2 | `docs/02_dimension_contracts.md` | D0–D10 各一页：applicability / I/O / metrics / phase |
-| 3 | Offline kernel skeleton + fixtures | 通过 P0 验收 A/B/C |
-| 4 | `examples/indonesian_n2s` adapter | 迁资产，不迁坏设计 |
+| 0 | `docs/00_executive_brief.md` | 向上汇报口径（已入库） |
+| 1 | `docs/01_core_contracts.md` | 7 Contract 字段级冻结（已起步） |
+| 2 | Offline kernel + toy multiclass + N2S replay | P0 验收 A/B/C（代码已起步） |
+| 3 | `docs/02_dimension_contracts.md` | D0–D10 各一页 Contract |
+| 4 | Online ModelAdapter + P1 packs | 下一阶段 |
 
-**Stop：** 本文仅冻结结构安排。未确认前不创建大包空实现、不迁 N2S 业务代码。
+**Note：** P0 离线内核与 Example adapters 已开始落地；空 Pack 实现目录仍禁止伪装为 supported。
 
 ---
 

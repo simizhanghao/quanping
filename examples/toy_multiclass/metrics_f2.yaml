@@ -1,0 +1,9 @@
+# Same predictions; different MetricSpec — proves offline metric swap.
+# For multiclass we keep accuracy/macro_f1; binary f2 swap is covered in unit tests.
+metrics:
+  label:
+    - accuracy
+    - macro_f1
+    - per_class
+round_digits: 4
+exclude_format_fail: true

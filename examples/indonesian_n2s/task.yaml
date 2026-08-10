@@ -1,0 +1,15 @@
+name: indonesian_n2s_reference
+task_type: structured_multitask
+targets:
+  - name: n2s
+    type: binary
+    path: $.n2s
+  - name: routing
+    type: multiclass
+    path: $.routing_skill
+  - name: intent
+    type: text
+    path: $.primary_intent
+    condition:
+      path: $.n2s
+      equals: true

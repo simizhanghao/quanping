@@ -1,0 +1,32 @@
+{"sample_id": "t01", "input": {"text": "I want a refund"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t02", "input": {"text": "Where is my package"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t03", "input": {"text": "Reset my password"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t04", "input": {"text": "Refund this order please"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t05", "input": {"text": "Track delivery"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t06", "input": {"text": "Cannot login"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t07", "input": {"text": "Money back"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t08", "input": {"text": "Shipment delayed"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t09", "input": {"text": "Change email"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t10", "input": {"text": "Cancel and refund"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t11", "input": {"text": "Courier status"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t12", "input": {"text": "Forgot password"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t13", "input": {"text": "Return item for refund"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t14", "input": {"text": "Package lost"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t15", "input": {"text": "Unlock account"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t16", "input": {"text": "I need refund now"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t17", "input": {"text": "When will it arrive"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t18", "input": {"text": "Update phone number"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t19", "input": {"text": "Full refund please"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t20", "input": {"text": "Wrong address delivery"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t21", "input": {"text": "Two factor setup"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t22", "input": {"text": "Chargeback refund"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t23", "input": {"text": "In transit where"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t24", "input": {"text": "Close my account"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t25", "input": {"text": "Refund to card"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t26", "input": {"text": "Express shipping issue"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t27", "input": {"text": "Password expired"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t28", "input": {"text": "Partial refund"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t29", "input": {"text": "Delivery failed"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t30", "input": {"text": "Verify identity"}, "gold": {"label": "account"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t31", "input": {"text": "Refund status"}, "gold": {"label": "refund"}, "meta": {"language": "en", "split": "smoke"}}
+{"sample_id": "t32", "input": {"text": "Shipping label"}, "gold": {"label": "shipping"}, "meta": {"language": "en", "split": "smoke"}}

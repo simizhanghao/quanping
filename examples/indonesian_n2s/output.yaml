@@ -1,0 +1,6 @@
+format: json
+parser: json
+schema:
+  required: [n2s, routing_skill, primary_intent]
+constraints:
+  no_markdown: true

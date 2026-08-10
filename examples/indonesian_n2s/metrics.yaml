@@ -1,0 +1,11 @@
+# Match legacy N2S report rounding (2 decimals) for offline replay acceptance.
+metrics:
+  n2s:
+    - precision
+    - recall
+    - f1
+    - f2
+    - accuracy
+    - confusion_matrix
+round_digits: 2
+exclude_format_fail: true
