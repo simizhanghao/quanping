@@ -235,7 +235,8 @@ eval_factory/                         # repo root（品牌 LinguaEval）
 │   ├── 00_executive_brief.md         # 立项 / 汇报口径
 │   ├── 01_project_structure.md       # 本文
 │   ├── 02_core_contracts.md          # 字段级冻结
-│   └── 03_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
+│   ├── 03_metric_denominators.md     # coverage / semantic / strict
+│   └── 04_dimension_contracts.md     # D0–D10 一页纸 Contract（planned）
 │
 ├── configs/                          # 用户/示例 YAML（NN_verb_object）
 │   └── examples/
@@ -349,6 +350,16 @@ LlamaFactory/tests/yewupingce/n2s_test/
 2. **B. Toy multiclass**：32–64 条文本分类走同一 Kernel，产出 accuracy / macro_f1。  
 3. **C. Metric swap**：同一 `predictions.jsonl` 仅改 MetricSpec（如 F1→F2）可重算，无需重跑模型。
 
+### P0.5 — Harden Kernel（可信 / 可比较）
+
+| Slice | Goal |
+|-------|------|
+| **A** | DatasetAdapter registry；primary metric 配置化；清 Kernel 业务泄漏 |
+| **B** | Parser/Validator；`from_raw` / `from_parsed`；ScoreRecord |
+| **C** | fingerprint / provenance；`data_audit.json`；coverage + semantic/strict 双口径（见 `docs/03_metric_denominators.md`） |
+
+**不做（P0.5）：** IndoMMLU、Calibration、Bootstrap、在线推理。
+
 ### P1 — Business + Schema + Regression + basic telemetry
 
 - D0 Integrity（overlap / missing gold / duplicate / class & language coverage）  
@@ -439,10 +450,11 @@ README 必须分两表：
 |------:|-------------|---------|
 | 0 | `docs/00_executive_brief.md` | 向上汇报口径（已入库） |
 | 1 | `docs/01_project_structure.md` | 结构安排（本文） |
-| 2 | `docs/02_core_contracts.md` | 7 Contract 字段级冻结（已起步） |
-| 3 | Offline kernel + numbered configs/results | P0 验收 A/B/C（已起步） |
-| 4 | `docs/03_dimension_contracts.md` | D0–D10 各一页 Contract |
-| 5 | Online ModelAdapter + Stage-1 packs | 下一阶段 |
+| 2 | `docs/02_core_contracts.md` | Contract 字段级冻结（含 ScoreRecord / provenance） |
+| 3 | `docs/03_metric_denominators.md` | coverage / semantic / strict（P0.5-C） |
+| 4 | Offline kernel + numbered configs/results | P0 + P0.5 验收 |
+| 5 | P1 Paired Regression + Statistics | Base↔SFT + CI 基建 |
+| 6 | `docs/04_dimension_contracts.md` | D0–D10 各一页 Contract |
 
 ### Naming habit（硬性）
 

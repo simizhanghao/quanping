@@ -11,6 +11,7 @@ import yaml
 
 from linguaeval.adapters.dataset.jsonl_samples import write_predictions_jsonl
 from linguaeval.adapters.dataset.registry import get_adapter
+from linguaeval.core.fingerprint import build_provenance
 from linguaeval.core.manifest import write_json, write_manifest
 from linguaeval.core.schema import (
     MetricSpec,
@@ -23,6 +24,11 @@ from linguaeval.core.schema import (
 )
 from linguaeval.metrics.aggregate import build_business_metrics
 from linguaeval.metrics.classification import score_targets
+from linguaeval.metrics.denominators import (
+    build_coverage,
+    light_data_audit,
+    score_modes_from_score_records,
+)
 from linguaeval.metrics.score_records import build_score_records
 from linguaeval.parse.pipeline import apply_output_spec
 from linguaeval.reports.markdown import write_report_md
@@ -39,7 +45,9 @@ def _resolve(base: Path, maybe: Optional[str]) -> Optional[Path]:
     return p if p.is_absolute() else (base / p).resolve()
 
 
-def load_bundle(config_path: Path) -> Tuple[Dict[str, Any], TaskSpec, OutputSpec, MetricSpec]:
+def load_bundle(
+    config_path: Path,
+) -> Tuple[Dict[str, Any], TaskSpec, OutputSpec, MetricSpec, Dict[str, Optional[Path]]]:
     cfg = _load_yaml(config_path)
     root = config_path.parent
     task_path = _resolve(root, cfg.get("task_spec") or cfg.get("task"))
@@ -52,14 +60,14 @@ def load_bundle(config_path: Path) -> Tuple[Dict[str, Any], TaskSpec, OutputSpec
     task = TaskSpec.from_dict(_load_yaml(task_path))
     output = OutputSpec.from_dict(_load_yaml(output_path) if output_path and output_path.is_file() else {})
     metrics = MetricSpec.from_dict(_load_yaml(metric_path))
-    return cfg, task, output, metrics
+    paths = {"task": task_path, "output": output_path, "metric": metric_path}
+    return cfg, task, output, metrics, paths
 
 
 def load_samples_and_preds(
     cfg: Dict[str, Any],
     config_path: Path,
 ) -> Tuple[List[SampleRecord], List[PredictionRecord]]:
-    """Dispatch via DatasetAdapter registry only (no business ifs)."""
     root = config_path.parent
     source = dict(cfg.get("source") or {})
     adapter_name = (
@@ -80,7 +88,7 @@ def _write_scores_jsonl(path: Path, scores: List[ScoreRecord]) -> None:
 
 
 def run_offline_score(config_path: Path) -> Path:
-    cfg, task, output_spec, metric_spec = load_bundle(config_path)
+    cfg, task, output_spec, metric_spec, spec_paths = load_bundle(config_path)
     samples, preds = load_samples_and_preds(cfg, config_path)
 
     parse_mode = (
@@ -93,12 +101,54 @@ def run_offline_score(config_path: Path) -> Path:
 
     preds = apply_output_spec(preds, output_spec, mode=parse_mode)
     score_rows = build_score_records(samples, preds, task)
+
+    # Backward-compatible semantic aggregate (exclude format fails inside score_targets)
     scored = score_targets(samples, preds, task, metric_spec)
     business = build_business_metrics(scored, report_cfg=cfg.get("report") or {})
+
+    format_ok = sum(1 for s in score_rows if s.parse_ok and s.schema_ok)
+    coverage = build_coverage(
+        eligible=len(samples),
+        with_prediction=len(score_rows),
+        format_ok=format_ok,
+        round_digits=metric_spec.round_digits if metric_spec.round_digits is not None else 4,
+    )
+    modes = score_modes_from_score_records(
+        score_rows,
+        task,
+        metric_spec.metrics,
+        round_digits=metric_spec.round_digits,
+    )
+
     business["parse"] = {
         "mode": parse_mode,
         "parser": output_spec.parser,
         "format": output_spec.format,
+    }
+    business["coverage"] = coverage
+    business["metrics_by_mode"] = modes
+    # Top-level targets remain semantic for compatibility; expose explicit pointer
+    business["metric_mode_default"] = "semantic"
+
+    sample_dicts = [s.to_dict() for s in samples]
+    pred_dicts = [p.to_dict() for p in preds]
+    provenance = build_provenance(
+        config_path=config_path,
+        cfg=cfg,
+        task_path=spec_paths.get("task"),
+        output_path=spec_paths.get("output"),
+        metric_path=spec_paths.get("metric"),
+        sample_dicts=sample_dicts,
+        prediction_dicts=pred_dicts,
+    )
+    audit = {
+        **light_data_audit(sample_dicts, score_rows),
+        "coverage": coverage,
+        "provenance": {
+            "dataset_fingerprint": provenance.get("dataset_fingerprint"),
+            "prediction_fingerprint": provenance.get("prediction_fingerprint"),
+            "config_hash": provenance.get("config_hash"),
+        },
     }
 
     out_dir_raw = cfg.get("output_dir") or "results/01_eval_offline"
@@ -121,6 +171,7 @@ def run_offline_score(config_path: Path) -> Path:
         config_path=str(config_path.resolve()),
         packs=list(cfg.get("packs") or ["business", "schema"]),
         artifact_index={},
+        provenance=provenance,
         notes={
             "mode": "offline_score",
             "adapter": adapter_name,
@@ -130,6 +181,7 @@ def run_offline_score(config_path: Path) -> Path:
             "n_score_records": len(score_rows),
             "task": task.name,
             "report": cfg.get("report") or {},
+            "metric_mode_default": "semantic",
         },
     )
 
@@ -139,6 +191,7 @@ def run_offline_score(config_path: Path) -> Path:
     _write_scores_jsonl(scores_out, score_rows)
     business_path = out_dir / "business_metrics.json"
     schema_path = out_dir / "schema_metrics.json"
+    audit_path = out_dir / "data_audit.json"
     report_path = out_dir / "report.md"
     manifest_path = out_dir / "manifest.json"
 
@@ -149,8 +202,10 @@ def run_offline_score(config_path: Path) -> Path:
             **(business.get("schema") or {}),
             "parse_mode": parse_mode,
             "parser": output_spec.parser,
+            "coverage": coverage,
         },
     )
+    write_json(audit_path, audit)
     write_report_md(report_path, business=business, manifest=manifest.to_dict())
 
     manifest.artifact_index = {
@@ -158,6 +213,7 @@ def run_offline_score(config_path: Path) -> Path:
         "scores": str(scores_out),
         "business_metrics": str(business_path),
         "schema_metrics": str(schema_path),
+        "data_audit": str(audit_path),
         "report": str(report_path),
     }
     write_manifest(manifest_path, manifest)

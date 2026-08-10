@@ -244,6 +244,7 @@ class RunManifest:
     config_path: Optional[str] = None
     packs: List[str] = field(default_factory=list)
     artifact_index: Dict[str, str] = field(default_factory=dict)
+    provenance: Dict[str, Any] = field(default_factory=dict)
     notes: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:

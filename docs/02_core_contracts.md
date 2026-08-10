@@ -89,4 +89,25 @@ parse:
 
 ## 9. RunManifest
 
-run_id, created_at, config_path, packs, artifact_index, notes.
+run_id, created_at, config_path, packs, artifact_index, notes, **provenance**.
+
+### provenance (P0.5-C)
+
+| Field | Notes |
+|-------|------|
+| git_sha | repo HEAD if available |
+| config_hash / task_spec_hash / output_spec_hash / metric_spec_hash | file sha256 |
+| dataset_fingerprint / prediction_fingerprint | canonical JSON sha256 of records |
+| eligible_samples / prediction_rows | counts |
+| adapter / parse_mode | from config |
+
+## 10. Metric denominators (P0.5-C)
+
+See `docs/03_metric_denominators.md`.
+
+| Mode | Denominator | Format fail |
+|------|-------------|-------------|
+| semantic (default top-level) | format_ok only | excluded |
+| strict | all with_prediction | counts as incorrect |
+
+Artifacts: `data_audit.json`, `business_metrics.coverage`, `business_metrics.metrics_by_mode`.
